@@ -402,7 +402,23 @@ main {
   color: var(--text-muted);
   margin-top: -2px;
   margin-bottom: 6px;
+}.btn-ai {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+  padding: 12px;
+  border: 1.5px dashed var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: var(--radius);
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.15s;
 }
+.btn-ai:active { background: rgba(13, 148, 136, 0.2); }
+.btn-ai:disabled { opacity: 0.6; cursor: not-allowed; }
 .form-actions {
   display: flex;
   gap: 10px;
