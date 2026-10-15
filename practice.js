@@ -1,6 +1,6 @@
 /* ============================================================
    Vocabulary Mini App — practice.js
-   Phase 3a: Practice Mode (setup + session + result)
+   Phase 3a: Practice Mode + Range filter
    Depends on: main.js (window.VocabMain)
    ============================================================ */
 
@@ -17,25 +17,65 @@
   var esc = M.esc;
   var uid = M.uid;
   var toast = M.toast;
-  var confirmDialog = M.confirmDialog;
 
   /* ---------- State ---------- */
   var setup = {
     mode: "bn_en",
     count: 10,
-    source: "all"
+    source: "all",
+    rangeFrom: null,
+    rangeTo: null
   };
 
   var session = null;
 
+  /* ---------- Helpers ---------- */
+  function getActiveWords() {
+    return M.words.filter(function (w) { return !w.deleted; });
+  }
+
+  function getSourceWords() {
+    var pool = getActiveWords();
+    if (setup.source === "new") {
+      pool = pool.filter(function (w) { return !w.practiced; });
+    } else if (setup.source === "wrong") {
+      pool = pool.filter(function (w) { return w.wrongCount && w.wrongCount > 0; });
+    } else if (setup.source === "range") {
+      var from = setup.rangeFrom || 1;
+      var to = setup.rangeTo || 99999;
+      pool = pool.filter(function (w) {
+        return w.no >= from && w.no <= to;
+      });
+    }
+    return pool;
+  }
+
+  function getRangeButtons() {
+    var active = getActiveWords();
+    if (!active.length) return [];
+    var maxNo = active.reduce(function (a, w) { return Math.max(a, w.no || 0); }, 0);
+    if (maxNo < 1) return [];
+
+    var buttons = [];
+    var step = 20;
+    for (var start = 1; start <= maxNo; start += step) {
+      var end = Math.min(start + step - 1, maxNo);
+      buttons.push({ from: start, to: end, label: start + "-" + end });
+    }
+    return buttons;
+  }
+
   /* ---------- Setup screen ---------- */
   function renderSetup() {
-    var total = M.words.filter(function (w) { return !w.deleted; }).length;
+    var total = getActiveWords().length;
     var notEnough = total < 4;
+    var sourceWords = getSourceWords();
+    var rangeValid = setup.source !== "range" || sourceWords.length >= 1;
 
     var h = '<section class="view">';
     h += '<div class="practice-setup">';
 
+    // Mode
     h += '<div class="setup-section">';
     h += '<p class="setup-label">' + t("mode") + '</p>';
     h += '<div class="setup-options">';
@@ -44,6 +84,7 @@
     h += '</div>';
     h += '</div>';
 
+    // Count
     h += '<div class="setup-section">';
     h += '<p class="setup-label">' + t("questionCount") + '</p>';
     h += '<div class="setup-options">';
@@ -53,15 +94,44 @@
     h += '</div>';
     h += '</div>';
 
+    // Source
     h += '<div class="setup-section">';
     h += '<p class="setup-label">' + t("wordSource") + '</p>';
     h += '<div class="setup-options">';
     h += '<button type="button" class="opt-btn' + (setup.source === "all" ? " on" : "") + '" data-set="source" data-val="all">' + t("source_all") + '</button>';
     h += '<button type="button" class="opt-btn' + (setup.source === "new" ? " on" : "") + '" data-set="source" data-val="new">' + t("source_new") + '</button>';
     h += '<button type="button" class="opt-btn' + (setup.source === "wrong" ? " on" : "") + '" data-set="source" data-val="wrong">' + t("source_wrong") + '</button>';
-    h += '</div>';
+    h += '<button type="button" class="opt-btn' + (setup.source === "range" ? " on" : "") + '" data-set="source" data-val="range">' + t("source_range") + '</button>';
     h += '</div>';
 
+    // Range sub-section
+    if (setup.source === "range") {
+      var rangeBtns = getRangeButtons();
+      h += '<div style="margin-top:12px">';
+      h += '<p class="setup-label" style="margin-bottom:8px">' + t("rangeLabel") + '</p>';
+      h += '<div class="setup-options">';
+      rangeBtns.forEach(function (r) {
+        var on = setup.rangeFrom === r.from && setup.rangeTo === r.to;
+        h += '<button type="button" class="opt-btn' + (on ? " on" : "") + '" data-range-from="' + r.from + '" data-range-to="' + r.to + '">' + r.label + '</button>';
+      });
+      h += '</div>';
+
+      // Custom inputs
+      h += '<div style="display:flex;gap:10px;margin-top:12px">';
+      h += '<div style="flex:1"><label style="display:block;font-size:0.75rem;color:var(--text-muted);margin-bottom:4px">' + t("rangeFrom") + '</label>';
+      h += '<input id="range-from" type="number" min="1" value="' + (setup.rangeFrom || 1) + '" class="answer-input" style="text-align:center;padding:10px 12px;font-size:1rem"></div>';
+      h += '<div style="flex:1"><label style="display:block;font-size:0.75rem;color:var(--text-muted);margin-bottom:4px">' + t("rangeTo") + '</label>';
+      h += '<input id="range-to" type="number" min="1" value="' + (setup.rangeTo || 20) + '" class="answer-input" style="text-align:center;padding:10px 12px;font-size:1rem"></div>';
+      h += '</div>';
+
+      var count = sourceWords.length;
+      h += '<p style="font-size:0.85rem;color:var(--text-muted);margin:10px 0 0;text-align:center">' + count + ' ' + t("rangeWordsFound") + '</p>';
+      h += '</div>';
+    }
+
+    h += '</div>';
+
+    // Start
     h += '<button type="button" class="practice-start" ' + (notEnough ? "disabled" : "") + ' data-act="practice-start">' + t("startPractice") + '</button>';
 
     if (notEnough) {
@@ -76,18 +146,37 @@
     M.setActiveNav("practice");
     M.showFab(false);
     M.showBack(false);
+
+    // Range input listeners
+    var fromInp = document.getElementById("range-from");
+    var toInp = document.getElementById("range-to");
+    if (fromInp) {
+      fromInp.addEventListener("input", function () {
+        setup.rangeFrom = parseInt(fromInp.value, 10) || 1;
+      });
+      fromInp.addEventListener("change", function () {
+        setup.rangeFrom = parseInt(fromInp.value, 10) || 1;
+        if (setup.rangeTo && setup.rangeFrom > setup.rangeTo) setup.rangeTo = setup.rangeFrom;
+        renderSetup();
+      });
+    }
+    if (toInp) {
+      toInp.addEventListener("input", function () {
+        setup.rangeTo = parseInt(toInp.value, 10) || 1;
+      });
+      toInp.addEventListener("change", function () {
+        setup.rangeTo = parseInt(toInp.value, 10) || 1;
+        if (setup.rangeFrom && setup.rangeTo < setup.rangeFrom) setup.rangeFrom = setup.rangeTo;
+        renderSetup();
+      });
+    }
   }
 
   /* ---------- Session ---------- */
   function startSession() {
-    var pool = M.words.filter(function (w) { return !w.deleted; });
-    if (setup.source === "new") {
-      pool = pool.filter(function (w) { return !w.practiced; });
-    } else if (setup.source === "wrong") {
-      pool = pool.filter(function (w) { return w.wrongCount && w.wrongCount > 0; });
-    }
+    var pool = getSourceWords();
 
-    if (pool.length < 4) {
+    if (pool.length < 1) {
       toast(t("notEnoughWords"));
       return;
     }
@@ -120,19 +209,17 @@
     if (!user) return false;
 
     if (session.mode === "bn_en") {
-      // User types English word
       return normalize(word.en) === user;
     } else {
-      // User types Bengali meaning(s) — loose match
       var userParts = user.split(/[,;،]+/).map(function (s) { return s.trim(); }).filter(Boolean);
       for (var i = 0; i < userParts.length; i++) {
         var up = userParts[i];
         for (var j = 0; j < word.bn.length; j++) {
           var wp = normalize(word.bn[j]);
           if (wp === up) return true;
+          if (wp.indexOf(up) > -1 && up.length >= 2) return true;
         }
       }
-      // Also accept if user typed entire joined string
       var joined = word.bn.map(normalize).join(", ");
       if (joined === user) return true;
       return false;
@@ -140,19 +227,13 @@
   }
 
   function getCorrectAnswerText(word) {
-    if (session.mode === "bn_en") {
-      return word.en;
-    } else {
-      return word.bn.join(", ");
-    }
+    if (session.mode === "bn_en") return word.en;
+    return word.bn.join(", ");
   }
 
   function getQuestionText(word) {
-    if (session.mode === "bn_en") {
-      return word.bn.join(", ");
-    } else {
-      return word.en;
-    }
+    if (session.mode === "bn_en") return word.bn.join(", ");
+    return word.en;
   }
 
   function getQuestionLabel() {
@@ -161,7 +242,7 @@
 
   function renderQuestion() {
     var word = currentWord();
-    if (!word) return renderResult();
+    if (!word) return finishSession();
 
     var total = session.questions.length;
     var n = session.current + 1;
@@ -169,17 +250,14 @@
 
     var h = '<section class="view practice-session">';
 
-    // Progress
     h += '<div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%"></div></div>';
     h += '<div class="q-counter"><span>' + t("questionOf", { n: n, total: total }) + '</span></div>';
 
-    // Question card
     h += '<div class="question-card">';
     h += '<div class="question-prompt">' + esc(getQuestionLabel()) + '</div>';
     h += '<div class="question-text' + (session.mode === "bn_en" ? " bengali" : "") + '">' + esc(getQuestionText(word)) + '</div>';
     h += '</div>';
 
-    // Answer input
     h += '<div class="answer-area">';
     var inputClass = "answer-input";
     if (session.answered) {
@@ -188,7 +266,6 @@
     h += '<input id="answer" type="text" class="' + inputClass + '" placeholder="' + esc(t("typeYourAnswer")) + '" value="' + esc(session.userAnswer) + '" autocomplete="off" autocapitalize="off" spellcheck="false"' + (session.answered ? " readonly" : "") + '>';
     h += '</div>';
 
-    // Feedback
     if (session.answered) {
       var ans = session.answers[session.current];
       if (ans.correct) {
@@ -198,7 +275,6 @@
       }
     }
 
-    // Actions
     h += '<div class="practice-actions">';
     if (!session.answered) {
       h += '<button type="button" class="btn-check" data-act="practice-check">' + t("check") + '</button>';
@@ -216,7 +292,6 @@
     M.showFab(false);
     M.showBack(false);
 
-    // Focus input
     if (!session.answered) {
       var inp = document.getElementById("answer");
       if (inp) {
@@ -296,7 +371,6 @@
     M.showFab(false);
     M.showBack(false);
 
-    // Save attempt stats to each word
     saveSessionStats();
   }
 
@@ -330,6 +404,18 @@
       var val = setBtn.dataset.val;
       if (key === "count") val = parseInt(val, 10);
       setup[key] = val;
+      if (key === "source" && val !== "range") {
+        setup.rangeFrom = null;
+        setup.rangeTo = null;
+      }
+      renderSetup();
+      return true;
+    }
+
+    var rangeBtn = e.target.closest("[data-range-from]");
+    if (rangeBtn && !session) {
+      setup.rangeFrom = parseInt(rangeBtn.dataset.rangeFrom, 10);
+      setup.rangeTo = parseInt(rangeBtn.dataset.rangeTo, 10);
       renderSetup();
       return true;
     }
@@ -339,29 +425,14 @@
 
     var a = act.dataset.act;
 
-    if (a === "practice-start") {
-      startSession();
-      return true;
-    }
-    if (a === "practice-check") {
-      doCheck();
-      return true;
-    }
-    if (a === "practice-next") {
-      doNext();
-      return true;
-    }
-    if (a === "practice-again") {
-      session = null;
-      renderSetup();
-      return true;
-    }
+    if (a === "practice-start") { startSession(); return true; }
+    if (a === "practice-check") { doCheck(); return true; }
+    if (a === "practice-next") { doNext(); return true; }
+    if (a === "practice-again") { session = null; renderSetup(); return true; }
     if (a === "practice-done") {
       session = null;
-      // go back to words
-      if (window.VocabMain && document.querySelector('[data-nav="words"]')) {
-        document.querySelector('[data-nav="words"]').click();
-      }
+      var navWords = document.querySelector('[data-nav="words"]');
+      if (navWords) navWords.click();
       return true;
     }
 
