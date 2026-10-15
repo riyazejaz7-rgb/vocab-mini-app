@@ -1,13 +1,6 @@
-/* ============================================================
-   Vocabulary Mini App — main.js
-   Local-first word manager with IndexedDB
-   Phase 3a: Recent/New/Wrong filters + Practice tab handle
-   ============================================================ */
-
 (function () {
   "use strict";
 
-  /* ---------- Telegram WebApp ---------- */
   var tg = window.Telegram && window.Telegram.WebApp;
   if (tg) {
     try {
@@ -21,7 +14,6 @@
   var CFG = window.APP_CONFIG || {};
   var TZ = CFG.TIME_ZONE || "Asia/Dhaka";
 
-  /* ---------- Translations ---------- */
   var L = {
     en: {
       words: "Words", trash: "Trash", tools: "Tools", practice: "Practice",
@@ -46,7 +38,6 @@
       permDeleted: "Deleted permanently", trashEmptied: "Trash emptied",
       needEn: "Enter the English word",
       needBn: "Enter at least one Bengali meaning",
-      dupTitle: "Already exists",
       dup: "This word is already saved as #{no}.",
       dupTrash: "This word is in Trash (#{no}). Restore it from there.",
       total: "Total", today: "Today",
@@ -56,7 +47,7 @@
       copy: "Copy", download: "Download", copied: "Copied",
       importTitle: "Import & restore",
       importDesc: "Paste lines like: english - bengali. Or a backup JSON.",
-      importPlaceholder: "abandon - পরিত্যাগ করা\nreluctant - অনিচ্ছুক, দ্বিধান্বিত",
+      importPlaceholder: "abandon - পরিত্যাগ করা",
       chooseFile: "Choose file", replaceAll: "Replace everything",
       importBtn: "Import",
       importResult: "Added: {a}. Skipped: {s}.",
@@ -67,33 +58,14 @@
       backupOld: "Last backup: {n} days ago",
       backupToday: "Last backup: today",
       backupNow: "Backup now",
-      confirmReplace1: "Replace ALL words with this backup? Your current words will be removed.",
+      confirmReplace1: "Replace ALL words with this backup?",
       confirmReplace2: "Are you sure? This cannot be undone.",
       pos_none: "(none)", pos_noun: "noun", pos_verb: "verb",
       pos_adjective: "adjective", pos_adverb: "adverb",
       pos_preposition: "preposition", pos_conjunction: "conjunction",
       pos_pronoun: "pronoun", pos_interjection: "interjection", pos_other: "other",
       practiceComingSoon: "Practice coming soon",
-      practiceComingSoonSub: "Refresh the app to load practice mode.",
-      practiceNoWords: "Add at least 4 words to start practicing.",
-      practiceNoWordsSub: "Tap + on the Words tab.",
-      practiceSetup: "Practice setup",
-      mode: "Mode", mode_bn_en: "বাংলা → English", mode_en_bn: "English → বাংলা", mode_fill: "Fill blanks",
-      questionCount: "Number of questions",
-      wordSource: "Which words",
-      source_all: "All words", source_new: "New words", source_wrong: "Wrong words",
-      startPractice: "Start practice",
-      check: "Check", next: "Next", finish: "Finish",
-      correctLabel: "Correct!", wrongLabel: "Not quite",
-      correctAnswerWas: "Correct answer:",
-      yourAnswer: "Your answer",
-      typeYourAnswer: "Type your answer…",
-      questionOf: "Question {n} of {total}",
-      resultGreat: "Excellent!", resultGood: "Good job!", resultOk: "Keep practicing",
-      youGot: "You got {c} out of {t} correct",
-      accuracy: "Accuracy",
-      tryAgain: "Try again", done: "Done",
-      notEnoughWords: "Need at least 4 words to practice"
+      practiceComingSoonSub: "Refresh the app to load practice mode."
     },
     bn: {
       words: "শব্দ", trash: "ট্র্যাশ", tools: "টুলস", practice: "প্র্যাকটিস",
@@ -118,7 +90,6 @@
       permDeleted: "চিরতরে মুছে ফেলা হয়েছে", trashEmptied: "ট্র্যাশ খালি করা হয়েছে",
       needEn: "ইংরেজি শব্দ লিখুন",
       needBn: "অন্তত একটি বাংলা অর্থ লিখুন",
-      dupTitle: "আগে থেকেই আছে",
       dup: "এই শব্দ আগেই সংরক্ষিত আছে #{no} হিসেবে।",
       dupTrash: "এই শব্দ ট্র্যাশে আছে (#{no})। সেখান থেকে ফিরিয়ে আনুন।",
       total: "মোট", today: "আজ",
@@ -128,7 +99,7 @@
       copy: "কপি", download: "ডাউনলোড", copied: "কপি হয়েছে",
       importTitle: "ইমপোর্ট ও রিস্টোর",
       importDesc: "লিখুন: english - বাংলা অর্থ। অথবা ব্যাকআপ JSON পেস্ট করুন।",
-      importPlaceholder: "abandon - পরিত্যাগ করা\nreluctant - অনিচ্ছুক, দ্বিধান্বিত",
+      importPlaceholder: "abandon - পরিত্যাগ করা",
       chooseFile: "ফাইল বেছে নিন", replaceAll: "সব বদলে দিন",
       importBtn: "ইমপোর্ট",
       importResult: "যোগ: {a}। বাদ: {s}।",
@@ -139,39 +110,19 @@
       backupOld: "শেষ ব্যাকআপ: {n} দিন আগে",
       backupToday: "শেষ ব্যাকআপ: আজ",
       backupNow: "ব্যাকআপ নিন",
-      confirmReplace1: "সব শব্দ এই ব্যাকআপ দিয়ে বদলাবেন? বর্তমান শব্দ মুছে যাবে।",
+      confirmReplace1: "সব শব্দ এই ব্যাকআপ দিয়ে বদলাবেন?",
       confirmReplace2: "নিশ্চিত? এটি ফেরানো যাবে না।",
       pos_none: "(নেই)", pos_noun: "বিশেষ্য", pos_verb: "ক্রিয়া",
       pos_adjective: "বিশেষণ", pos_adverb: "ক্রিয়া-বিশেষণ",
       pos_preposition: "পূর্বসর্গ", pos_conjunction: "সংযোজক",
       pos_pronoun: "সর্বনাম", pos_interjection: "আবেগসূচক", pos_other: "অন্যান্য",
       practiceComingSoon: "প্র্যাকটিস শীঘ্রই আসছে",
-      practiceComingSoonSub: "অ্যাপ রিফ্রেশ করুন প্র্যাকটিস মোড লোড করতে।",
-      practiceNoWords: "অন্তত ৪টি শব্দ যোগ করুন প্র্যাকটিস শুরু করতে।",
-      practiceNoWordsSub: "শব্দ ট্যাবে + চাপুন।",
-      practiceSetup: "প্র্যাকটিস সেটআপ",
-      mode: "মোড", mode_bn_en: "বাংলা → English", mode_en_bn: "English → বাংলা", mode_fill: "ফাঁকা পূরণ",
-      questionCount: "প্রশ্ন সংখ্যা",
-      wordSource: "কোন শব্দ",
-      source_all: "সব শব্দ", source_new: "নতুন শব্দ", source_wrong: "ভুল শব্দ",
-      startPractice: "প্র্যাকটিস শুরু",
-      check: "যাচাই", next: "পরবর্তী", finish: "শেষ",
-      correctLabel: "সঠিক!", wrongLabel: "সঠিক হয়নি",
-      correctAnswerWas: "সঠিক উত্তর:",
-      yourAnswer: "আপনার উত্তর",
-      typeYourAnswer: "উত্তর লিখুন…",
-      questionOf: "প্রশ্ন {n} / {total}",
-      resultGreat: "অসাধারণ!", resultGood: "ভালো করেছ!", resultOk: "আরো প্র্যাকটিস কর",
-      youGot: "{t}টির মধ্যে {c}টি সঠিক",
-      accuracy: "নির্ভুলতা",
-      tryAgain: "আবার চেষ্টা", done: "সম্পন্ন",
-      notEnoughWords: "প্র্যাকটিসের জন্য অন্তত ৪টি শব্দ দরকার"
+      practiceComingSoonSub: "অ্যাপ রিফ্রেশ করুন প্র্যাকটিস মোড লোড করতে।"
     }
   };
 
   var POS = ["", "noun", "verb", "adjective", "adverb", "preposition", "conjunction", "pronoun", "interjection", "other"];
 
-  /* ---------- State ---------- */
   var lang = localStorage.getItem("vocab_lang") === "bn" ? "bn" : "en";
   var words = [];
   var db = null;
@@ -183,7 +134,6 @@
   var lastBackup = 0;
   var exportBuf = { text: "", kind: "" };
 
-  /* ---------- Helpers ---------- */
   function t(key, args) {
     var s = (L[lang] && L[lang][key]) || L.en[key] || key;
     if (args) s = s.replace(/\{(\w+)\}/g, function (_, k) { return args[k] != null ? args[k] : ""; });
@@ -236,7 +186,6 @@
     });
   }
 
-  /* ---------- IndexedDB ---------- */
   function openDB() {
     return new Promise(function (resolve, reject) {
       var req = indexedDB.open("vocab_db", 1);
@@ -309,7 +258,6 @@
     return null;
   }
 
-  /* ---------- Expose for practice.js ---------- */
   window.VocabMain = {
     get words() { return words; },
     get lang() { return lang; },
@@ -333,10 +281,8 @@
     showBack: function (show) {
       var b = $("back"); if (b) b.classList.toggle("hidden", !show);
     },
-    getAppEl: function () { return $("app"); },
-    getFilterSource: function () { return filterSource; }
+    getAppEl: function () { return $("app"); }
   };
-/* ---------- Rendering — Words list ---------- */
 function activeWords() {
   return words.filter(function (w) { return !w.deleted; });
 }
@@ -409,9 +355,6 @@ function renderWords() {
     if (wrongCount > 0) {
       html += '<button data-source="wrong" class="' + (filterSource === "wrong" ? "on" : "") + '">' + t("wrong_words") + ' (' + wrongCount + ')</button>';
     }
-    if (filterPos || recentCount > 0 || newCount > 0 || wrongCount > 0) {
-      html += '<span style="width:1px;background:var(--border);margin:6px 2px;flex-shrink:0"></span>';
-    }
     POS.slice(1).forEach(function (p) {
       var count = activeWords().filter(function (w) { return w.pos === p; }).length;
       if (count === 0) return;
@@ -476,7 +419,6 @@ function emptyState(titleKey, subKey) {
     '</div>';
 }
 
-/* ---------- Rendering — Add/Edit form ---------- */
 function renderForm() {
   var w = editingId ? getWord(editingId) : null;
   var isEdit = !!w;
@@ -526,7 +468,6 @@ function renderForm() {
   if (first) setTimeout(function () { first.focus(); }, 100);
 }
 
-/* ---------- Rendering — Trash ---------- */
 function renderTrash() {
   var list = trashWords();
 
@@ -551,7 +492,7 @@ function renderTrash() {
         '<button data-act="del-forever" data-id="' + w.id + '" class="danger">' + t("delForever") + '</button>' +
         '</div></article>';
     }).join("");
-    h += '<div style="margin-top:20px"><button type="button" data-act="empty-trash" class="btn-secondary" style="width:100%;padding:14px;border-radius:14px;font-weight:700">' + t("confirmEmptyTrash").replace(/\?.*/, "") + '</button></div>';
+    h += '<div style="margin-top:20px"><button type="button" data-act="empty-trash" class="btn-secondary" style="width:100%;padding:14px;border-radius:14px;font-weight:700">Empty trash</button></div>';
   }
   h += '</section>';
 
@@ -562,7 +503,6 @@ function renderTrash() {
   showBack(false);
 }
 
-/* ---------- Rendering — Tools ---------- */
 function renderTools() {
   var h = '<section class="view">';
 
@@ -617,7 +557,6 @@ function renderTools() {
   }
 }
 
-/* ---------- UI helpers ---------- */
 function setTitle(s) { var el = $("title"); if (el) el.textContent = s; }
 function setActiveNav(k) {
   document.querySelectorAll(".navbtn").forEach(function (b) {
@@ -634,7 +573,6 @@ function updateLangChip() {
   var c = $("lang-toggle");
   if (c) c.textContent = lang === "bn" ? "EN" : "বাং";
 }
-  /* ---------- Actions ---------- */
   async function saveWord() {
     var en = ($("f_en").value || "").trim();
     var bn = splitList($("f_bn").value);
@@ -720,7 +658,6 @@ function updateLangChip() {
     render();
   }
 
-  /* ---------- Export / Import ---------- */
   function exportJson() {
     var payload = {
       app: "vocab-mini-app",
@@ -901,7 +838,6 @@ function updateLangChip() {
     toast(t("restoreResult", { a: added, u: updated, s: skipped }));
   }
 
-  /* ---------- Navigation ---------- */
   function go(v) {
     view = v;
     editingId = null;
@@ -931,7 +867,6 @@ function updateLangChip() {
     else if (view === "add") renderForm();
   }
 
-  /* ---------- Event handlers ---------- */
   document.addEventListener("click", function (e) {
     var nav = e.target.closest("[data-nav]");
     if (nav) return go(nav.dataset.nav);
@@ -1002,7 +937,6 @@ function updateLangChip() {
     }
   });
 
-  /* ---------- Init ---------- */
   async function init() {
     try {
       await openDB();
