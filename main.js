@@ -11,9 +11,13 @@
     } catch (e) {}
   }
 
+  var CFG = window.APP_CONFIG || {};
+  var MASTERY = CFG.MASTERY || { MIN_CORRECT: 5, MIN_DAYS: 3 };
+  var LEITNER_DAYS = [1, 3, 7, 14, 30];
+
   var L = {
     en: {
-      words: "Words", trash: "Trash", tools: "Tools", practice: "Practice",
+      words: "Words", trash: "Trash", tools: "Tools", practice: "Practice", stats: "Stats",
       add: "Add word", edit: "Edit word",
       search: "Search words…", all: "All",
       recent: "Recent", new_words: "New", wrong_words: "Wrong",
@@ -61,77 +65,75 @@
       pos_adjective: "adjective", pos_adverb: "adverb",
       pos_preposition: "preposition", pos_conjunction: "conjunction",
       pos_pronoun: "pronoun", pos_interjection: "interjection", pos_other: "other",
-      practice: "Practice",
-      practiceSetup: "Practice setup",
+      practice: "Practice", practiceSetup: "Practice setup",
       mode: "Mode",
-      mode_bn_en: "বাংলা → English",
-      mode_en_bn: "English → বাংলা",
-      mode_fill: "Fill blanks",
+      mode_bn_en: "বাংলা → English", mode_en_bn: "English → বাংলা", mode_fill: "Fill blanks",
       questionCount: "Number of questions",
       wordSource: "Which words",
-      source_all: "All words",
-      source_new: "New words",
-      source_wrong: "Wrong words",
-      source_range: "Range",
-      rangeLabel: "Pick a range",
-      rangeFrom: "From",
-      rangeTo: "To",
+      source_all: "All words", source_new: "New words", source_wrong: "Wrong words",
+      source_range: "Range", source_due: "Due today",
+      rangeLabel: "Pick a range", rangeFrom: "From", rangeTo: "To",
       rangeWordsFound: "words found",
       startPractice: "Start practice",
-      check: "Check",
-      next: "Next",
-      finish: "Finish",
-      correctLabel: "Correct!",
-      wrongLabel: "Wrong",
+      check: "Check", next: "Next", finish: "Finish",
+      correctLabel: "Correct!", wrongLabel: "Wrong",
       correctAnswerWas: "Correct answer:",
       typeYourAnswer: "Type your answer…",
       questionOf: "Question {n} of {total}",
-      resultGreat: "Excellent!",
-      resultGood: "Good job!",
-      resultOk: "Keep practicing",
+      resultGreat: "Excellent!", resultGood: "Good job!", resultOk: "Keep practicing",
       youGot: "You got {c} out of {t} correct",
       accuracy: "Accuracy",
-      tryAgain: "Try again",
-      done: "Done",
+      tryAgain: "Try again", done: "Done",
       notEnoughWords: "Need at least 4 words to practice",
       practiceNoWords: "Add at least 4 words to start practicing.",
       practiceNoWordsSub: "Tap + on the Words tab.",
       practiceComingSoon: "Practice coming soon",
       practiceComingSoonSub: "Refresh the app to load practice mode.",
-      paused: "Paused",
-      pausedAuto: "Auto-paused (idle)",
-      pausedLabel: "Timer paused",
-      resumed: "Resumed",
-      resume: "Resume",
-      totalTime: "Total time",
-      avgTime: "Avg / question",
-      viewDetails: "View details",
-      hideDetails: "Hide details",
+      paused: "Paused", pausedAuto: "Auto-paused (idle)",
+      pausedLabel: "Timer paused", resumed: "Resumed", resume: "Resume",
+      totalTime: "Total time", avgTime: "Avg / question",
+      viewDetails: "View details", hideDetails: "Hide details",
       practiceWrong: "Practice wrong",
-      youWrote: "You wrote:",
-      correctAnswer: "Correct answer:",
+      youWrote: "You wrote:", correctAnswer: "Correct answer:",
       historyTitle: "Practice history",
       historyDesc: "Your past practice sessions.",
       historyEmpty: "No sessions yet",
       historyEmptySub: "Complete a practice session to see it here.",
-      historyToday: "Today",
-      historyYesterday: "Yesterday",
-      historySession: "Session",
-      historyMode: "Mode",
-      historyScore: "Score",
-      historyTime: "Time",
+      historyToday: "Today", historyYesterday: "Yesterday",
+      historySession: "Session", historyMode: "Mode",
+      historyScore: "Score", historyTime: "Time",
       historyClear: "Clear history",
       historyClearConfirm: "Delete all practice history?",
-     historyCleared: "History cleared",
-      filterAll: "All",
-      filterToday: "Today",
-      filter7d: "7 days",
-      filter30d: "30 days",
+      historyCleared: "History cleared",
+      filterAll: "All", filterToday: "Today", filter7d: "7 days", filter30d: "30 days",
       deleteSession: "Delete this session?",
-      sessionDeleted: "Session deleted"
+      sessionDeleted: "Session deleted",
+      statsTitle: "Stats",
+      statsTodayPracticed: "Today",
+      statsWeekPracticed: "7 days",
+      statsTotalWords: "Words",
+      statsMastered: "Mastered",
+      statsStreak: "Streak",
+      statsDays: "days",
+      statsDueToday: "Due today",
+      statsDueTodayDesc: "Review these words today",
+      statsDueNothing: "Nothing due today — great work!",
+      statsStartReview: "Start review",
+      statsWeeklyChart: "Last 7 days",
+      statsMasteredList: "Mastered words",
+      statsMasteredEmpty: "No mastered words yet. Keep practicing!",
+      statsReviewSchedule: "Review schedule",
+      statsBox: "Box {n}",
+      statsNextReview: "Next: {d} days",
+      statsReviewNow: "Review now",
+      statsLevel1: "Learning",
+      statsLevel2: "Almost",
+      statsLevel3: "Good",
+      statsLevel4: "Strong",
+      statsLevel5: "Mastered"
     },
     bn: {
-      words: "শব্দ", trash: "ট্র্যাশ", tools: "টুলস", practice: "প্র্যাকটিস",
+      words: "শব্দ", trash: "ট্র্যাশ", tools: "টুলস", practice: "প্র্যাকটিস", stats: "স্ট্যাটস",
       add: "শব্দ যোগ", edit: "শব্দ সম্পাদনা",
       search: "শব্দ খুঁজুন…", all: "সব",
       recent: "সাম্প্রতিক", new_words: "নতুন", wrong_words: "ভুল",
@@ -179,74 +181,72 @@
       pos_adjective: "বিশেষণ", pos_adverb: "ক্রিয়া-বিশেষণ",
       pos_preposition: "পূর্বসর্গ", pos_conjunction: "সংযোজক",
       pos_pronoun: "সর্বনাম", pos_interjection: "আবেগসূচক", pos_other: "অন্যান্য",
-      practice: "প্র্যাকটিস",
-      practiceSetup: "প্র্যাকটিস সেটআপ",
+      practice: "প্র্যাকটিস", practiceSetup: "প্র্যাকটিস সেটআপ",
       mode: "মোড",
-      mode_bn_en: "বাংলা → English",
-      mode_en_bn: "English → বাংলা",
-      mode_fill: "ফাঁকা পূরণ",
+      mode_bn_en: "বাংলা → English", mode_en_bn: "English → বাংলা", mode_fill: "ফাঁকা পূরণ",
       questionCount: "প্রশ্ন সংখ্যা",
       wordSource: "কোন শব্দ",
-      source_all: "সব শব্দ",
-      source_new: "নতুন শব্দ",
-      source_wrong: "ভুল শব্দ",
-      source_range: "রেঞ্জ",
-      rangeLabel: "রেঞ্জ বেছে নিন",
-      rangeFrom: "থেকে",
-      rangeTo: "পর্যন্ত",
+      source_all: "সব শব্দ", source_new: "নতুন শব্দ", source_wrong: "ভুল শব্দ",
+      source_range: "রেঞ্জ", source_due: "আজকের রিভিউ",
+      rangeLabel: "রেঞ্জ বেছে নিন", rangeFrom: "থেকে", rangeTo: "পর্যন্ত",
       rangeWordsFound: "শব্দ পাওয়া গেছে",
       startPractice: "প্র্যাকটিস শুরু",
-      check: "যাচাই",
-      next: "পরবর্তী",
-      finish: "শেষ",
-      correctLabel: "সঠিক!",
-      wrongLabel: "সঠিক হয়নি",
+      check: "যাচাই", next: "পরবর্তী", finish: "শেষ",
+      correctLabel: "সঠিক!", wrongLabel: "সঠিক হয়নি",
       correctAnswerWas: "সঠিক উত্তর:",
       typeYourAnswer: "উত্তর লিখুন…",
       questionOf: "প্রশ্ন {n} / {total}",
-      resultGreat: "অসাধারণ!",
-      resultGood: "ভালো করেছ!",
-      resultOk: "আরো প্র্যাকটিস কর",
+      resultGreat: "অসাধারণ!", resultGood: "ভালো করেছ!", resultOk: "আরো প্র্যাকটিস কর",
       youGot: "{t}টির মধ্যে {c}টি সঠিক",
       accuracy: "নির্ভুলতা",
-      tryAgain: "আবার চেষ্টা",
-      done: "সম্পন্ন",
+      tryAgain: "আবার চেষ্টা", done: "সম্পন্ন",
       notEnoughWords: "প্র্যাকটিসের জন্য অন্তত ৪টি শব্দ দরকার",
       practiceNoWords: "অন্তত ৪টি শব্দ যোগ করুন প্র্যাকটিস শুরু করতে।",
       practiceNoWordsSub: "শব্দ ট্যাবে + চাপুন।",
       practiceComingSoon: "প্র্যাকটিস শীঘ্রই আসছে",
       practiceComingSoonSub: "অ্যাপ রিফ্রেশ করুন প্র্যাকটিস মোড লোড করতে।",
-      paused: "বিরতি",
-      pausedAuto: "অটো বিরতি (idle)",
-      pausedLabel: "টাইমার বিরতিতে",
-      resumed: "চালু হয়েছে",
-      resume: "চালু করুন",
-      totalTime: "মোট সময়",
-      avgTime: "গড় / প্রশ্ন",
-      viewDetails: "বিস্তারিত দেখুন",
-      hideDetails: "বিস্তারিত লুকান",
+      paused: "বিরতি", pausedAuto: "অটো বিরতি (idle)",
+      pausedLabel: "টাইমার বিরতিতে", resumed: "চালু হয়েছে", resume: "চালু করুন",
+      totalTime: "মোট সময়", avgTime: "গড় / প্রশ্ন",
+      viewDetails: "বিস্তারিত দেখুন", hideDetails: "বিস্তারিত লুকান",
       practiceWrong: "ভুলগুলো প্র্যাকটিস",
-      youWrote: "আপনি লিখেছেন:",
-      correctAnswer: "সঠিক উত্তর:",
+      youWrote: "আপনি লিখেছেন:", correctAnswer: "সঠিক উত্তর:",
       historyTitle: "প্র্যাকটিস হিস্ট্রি",
       historyDesc: "আপনার আগের প্র্যাকটিস সেশন।",
       historyEmpty: "এখনো কোনো সেশন নেই",
       historyEmptySub: "একটি প্র্যাকটিস সেশন সম্পন্ন করলে এখানে দেখা যাবে।",
-      historyToday: "আজ",
-      historyYesterday: "গতকাল",
-      historySession: "সেশন",
-      historyMode: "মোড",
-      historyScore: "স্কোর",
-      historyTime: "সময়",
+      historyToday: "আজ", historyYesterday: "গতকাল",
+      historySession: "সেশন", historyMode: "মোড",
+      historyScore: "স্কোর", historyTime: "সময়",
       historyClear: "হিস্ট্রি মুছুন",
       historyClearConfirm: "সব প্র্যাকটিস হিস্ট্রি মুছবেন?",
-    historyCleared: "হিস্ট্রি মুছে ফেলা হয়েছে",
-      filterAll: "সব",
-      filterToday: "আজ",
-      filter7d: "৭ দিন",
-      filter30d: "৩০ দিন",
+      historyCleared: "হিস্ট্রি মুছে ফেলা হয়েছে",
+      filterAll: "সব", filterToday: "আজ", filter7d: "৭ দিন", filter30d: "৩০ দিন",
       deleteSession: "এই সেশনটি মুছবেন?",
-      sessionDeleted: "সেশন মুছে ফেলা হয়েছে"
+      sessionDeleted: "সেশন মুছে ফেলা হয়েছে",
+      statsTitle: "স্ট্যাটস",
+      statsTodayPracticed: "আজ",
+      statsWeekPracticed: "৭ দিন",
+      statsTotalWords: "শব্দ",
+      statsMastered: "মাস্টারড",
+      statsStreak: "স্ট্রিক",
+      statsDays: "দিন",
+      statsDueToday: "আজকের রিভিউ",
+      statsDueTodayDesc: "আজ এই শব্দগুলো রিভিউ করুন",
+      statsDueNothing: "আজ কোনো রিভিউ নেই — দারুণ!",
+      statsStartReview: "রিভিউ শুরু",
+      statsWeeklyChart: "শেষ ৭ দিন",
+      statsMasteredList: "মাস্টারড শব্দ",
+      statsMasteredEmpty: "এখনো কোনো মাস্টারড শব্দ নেই। চালিয়ে যান!",
+      statsReviewSchedule: "রিভিউ শিডিউল",
+      statsBox: "বক্স {n}",
+      statsNextReview: "পরবর্তী: {d} দিন",
+      statsReviewNow: "এখনই রিভিউ",
+      statsLevel1: "শিখছি",
+      statsLevel2: "প্রায়",
+      statsLevel3: "ভালো",
+      statsLevel4: "শক্ত",
+      statsLevel5: "মাস্টারড"
     }
   };
 
@@ -255,6 +255,7 @@
   var lang = localStorage.getItem("vocab_lang") === "bn" ? "bn" : "en";
   var words = [];
   var sessions = [];
+  var reviews = {};
   var db = null;
   var view = "words";
   var editingId = null;
@@ -288,6 +289,10 @@
   function daysSince(ts) {
     return Math.floor((Date.now() - ts) / 86400000);
   }
+  function todayKey() {
+    var d = new Date();
+    return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+  }
   function toast(msg, ms) {
     var el = $("toast");
     if (!el) return;
@@ -318,18 +323,13 @@
 
   function openDB() {
     return new Promise(function (resolve, reject) {
-      var req = indexedDB.open("vocab_db", 2);
+      var req = indexedDB.open("vocab_db", 3);
       req.onupgradeneeded = function (ev) {
         var d = req.result;
-        if (!d.objectStoreNames.contains("words")) {
-          d.createObjectStore("words", { keyPath: "id" });
-        }
-        if (!d.objectStoreNames.contains("meta")) {
-          d.createObjectStore("meta", { keyPath: "k" });
-        }
-        if (!d.objectStoreNames.contains("sessions")) {
-          d.createObjectStore("sessions", { keyPath: "id" });
-        }
+        if (!d.objectStoreNames.contains("words")) d.createObjectStore("words", { keyPath: "id" });
+        if (!d.objectStoreNames.contains("meta")) d.createObjectStore("meta", { keyPath: "k" });
+        if (!d.objectStoreNames.contains("sessions")) d.createObjectStore("sessions", { keyPath: "id" });
+        if (!d.objectStoreNames.contains("reviews")) d.createObjectStore("reviews", { keyPath: "wordId" });
       };
       req.onsuccess = function () { db = req.result; resolve(); };
       req.onerror = function () { reject(req.error); };
@@ -344,42 +344,20 @@
       tx.onerror = tx.onabort = function () { reject(tx.error); };
     });
   }
-  function dbGetAllWords() {
-    return txStore("words", "readonly", function (s) { return s.getAll(); });
-  }
-  function dbGetAllSessions() {
-    return txStore("sessions", "readonly", function (s) { return s.getAll(); });
-  }
-  function dbPutWord(w) {
-    return txStore("words", "readwrite", function (s) { s.put(w); });
-  }
-  function dbPutSession(se) {
-    return txStore("sessions", "readwrite", function (s) { s.put(se); });
-  }
-  function dbDeleteSession(id) {
-    return txStore("sessions", "readwrite", function (s) { s.delete(id); });
-  }
-  function dbClearSessions() {
-    return txStore("sessions", "readwrite", function (s) { s.clear(); });
-  }
-  function dbPutWords(ws) {
-    return txStore("words", "readwrite", function (s) {
-      ws.forEach(function (w) { s.put(w); });
-    });
-  }
-  function dbDeleteWord(id) {
-    return txStore("words", "readwrite", function (s) { s.delete(id); });
-  }
-  function dbClearWords() {
-    return txStore("words", "readwrite", function (s) { s.clear(); });
-  }
-  function metaGet(k) {
-    return txStore("meta", "readonly", function (s) { return s.get(k); })
-      .then(function (r) { return r ? r.v : undefined; });
-  }
-  function metaSet(k, v) {
-    return txStore("meta", "readwrite", function (s) { s.put({ k: k, v: v }); });
-  }
+  function dbGetAllWords() { return txStore("words", "readonly", function (s) { return s.getAll(); }); }
+  function dbGetAllSessions() { return txStore("sessions", "readonly", function (s) { return s.getAll(); }); }
+  function dbGetAllReviews() { return txStore("reviews", "readonly", function (s) { return s.getAll(); }); }
+  function dbPutWord(w) { return txStore("words", "readwrite", function (s) { s.put(w); }); }
+  function dbPutSession(se) { return txStore("sessions", "readwrite", function (s) { s.put(se); }); }
+  function dbDeleteSession(id) { return txStore("sessions", "readwrite", function (s) { s.delete(id); }); }
+  function dbClearSessions() { return txStore("sessions", "readwrite", function (s) { s.clear(); }); }
+  function dbPutReview(r) { return txStore("reviews", "readwrite", function (s) { s.put(r); }); }
+  function dbClearReviews() { return txStore("reviews", "readwrite", function (s) { s.clear(); }); }
+  function dbPutWords(ws) { return txStore("words", "readwrite", function (s) { ws.forEach(function (w) { s.put(w); }); }); }
+  function dbDeleteWord(id) { return txStore("words", "readwrite", function (s) { s.delete(id); }); }
+  function dbClearWords() { return txStore("words", "readwrite", function (s) { s.clear(); }); }
+  function metaGet(k) { return txStore("meta", "readonly", function (s) { return s.get(k); }).then(function (r) { return r ? r.v : undefined; }); }
+  function metaSet(k, v) { return txStore("meta", "readwrite", function (s) { s.put({ k: k, v: v }); }); }
   async function getNextNo() {
     var n = (await metaGet("nextNo")) || 1;
     await metaSet("nextNo", n + 1);
@@ -402,338 +380,326 @@
     for (var i = 0; i < words.length; i++) if (words[i].id === id) return words[i];
     return null;
   }
+  function getReview(wordId) {
+    return reviews[wordId] || null;
+  }
+  function isDueToday(wordId) {
+    var r = reviews[wordId];
+    if (!r) return true;
+    if (!r.nextReview) return true;
+    return r.nextReview <= Date.now();
+  }
+  function getDueWords() {
+    return words.filter(function (w) {
+      return !w.deleted && isDueToday(w.id);
+    });
+  }
+  function isMastered(wordId) {
+    var r = reviews[wordId];
+    if (!r) return false;
+    return (r.box || 0) >= 5;
+  }
+  function updateReviewAfterAnswer(wordId, correct) {
+    var r = reviews[wordId] || {
+      wordId: wordId,
+      box: 0,
+      lastReview: 0,
+      nextReview: 0,
+      correctStreak: 0,
+      days: {}
+    };
+    var tk = todayKey();
+    r.days = r.days || {};
+    r.days[tk] = (r.days[tk] || 0) + (correct ? 1 : 0);
+    if (correct) {
+      r.box = Math.min(5, (r.box || 0) + 1);
+      r.correctStreak = (r.correctStreak || 0) + 1;
+    } else {
+      r.box = 1;
+      r.correctStreak = 0;
+    }
+    var correctDays = 0;
+    var totalCorrect = 0;
+    Object.keys(r.days).forEach(function (d) {
+      if (r.days[d] > 0) correctDays++;
+      totalCorrect += r.days[d];
+    });
+    if (totalCorrect >= MASTERY.MIN_CORRECT && correctDays >= MASTERY.MIN_DAYS) {
+      r.box = 5;
+    }
+    r.lastReview = Date.now();
+    var interval = LEITNER_DAYS[Math.max(0, Math.min(LEITNER_DAYS.length - 1, (r.box || 1) - 1))] || 1;
+    r.nextReview = Date.now() + interval * 86400000;
+    reviews[wordId] = r;
+    return dbPutReview(r);
+  }
 
   window.VocabMain = {
     get words() { return words; },
     get sessions() { return sessions; },
+    get reviews() { return reviews; },
     get lang() { return lang; },
-    t: t,
-    esc: esc,
-    uid: uid,
-    toast: toast,
-    confirmDialog: confirmDialog,
-    dbPutWord: dbPutWord,
-    dbPutSession: dbPutSession,
-    dbGetAllSessions: dbGetAllSessions,
-    dbClearSessions: dbClearSessions,dbDeleteSession: dbDeleteSession,
-    metaGet: metaGet,
-    metaSet: metaSet,
-    daysSince: daysSince,
+    t: t, esc: esc, uid: uid, toast: toast, confirmDialog: confirmDialog,
+    dbPutWord: dbPutWord, dbPutSession: dbPutSession, dbGetAllSessions: dbGetAllSessions,
+    dbDeleteSession: dbDeleteSession, dbClearSessions: dbClearSessions,
+    dbPutReview: dbPutReview, dbClearReviews: dbClearReviews,
+    metaGet: metaGet, metaSet: metaSet, daysSince: daysSince,
+    isDueToday: isDueToday, getDueWords: getDueWords, isMastered: isMastered,
+    updateReviewAfterAnswer: updateReviewAfterAnswer,
     setTitle: function (s) { var el = $("title"); if (el) el.textContent = s; },
     setActiveNav: function (k) {
       document.querySelectorAll(".navbtn").forEach(function (b) {
         b.classList.toggle("active", b.dataset.nav === k);
       });
     },
-    showFab: function (show) {
-      var f = $("fab"); if (f) f.classList.toggle("hidden", !show);
-    },
-    showBack: function (show) {
-      var b = $("back"); if (b) b.classList.toggle("hidden", !show);
-    },
-    getAppEl: function () { return $("app"); }
+    showFab: function (show) { var f = $("fab"); if (f) f.classList.toggle("hidden", !show); },
+    showBack: function (show) { var b = $("back"); if (b) b.classList.toggle("hidden", !show); },
+    getAppEl: function () { return $("app"); },
+    LEITNER_DAYS: LEITNER_DAYS,
+    MASTERY: MASTERY
   };
-function activeWords() {
-  return words.filter(function (w) { return !w.deleted; });
-}
-function trashWords() {
-  return words.filter(function (w) { return w.deleted; })
-    .sort(function (a, b) { return a.deleted - b.deleted; });
-}
-function matches(w) {
-  if (filterPos && w.pos !== filterPos) return false;
-  if (filterSource === "recent") {
-    if (!w.created) return false;
-    var daysOld = (Date.now() - w.created) / 86400000;
-    if (daysOld > 7) return false;
-  } else if (filterSource === "new") {
-    if (w.practiced) return false;
-  } else if (filterSource === "wrong") {
-    if (!w.wrongCount || w.wrongCount < 1) return false;
+  function activeWords() {
+    return words.filter(function (w) { return !w.deleted; });
   }
-  if (!query) return true;
-  var q = query.toLowerCase();
-  return (w.en && w.en.toLowerCase().indexOf(q) > -1) ||
-    (w.bn && w.bn.join(" ").toLowerCase().indexOf(q) > -1) ||
-    (w.syn && w.syn.join(" ").toLowerCase().indexOf(q) > -1) ||
-    (w.ant && w.ant.join(" ").toLowerCase().indexOf(q) > -1) ||
-    (w.note && w.note.toLowerCase().indexOf(q) > -1);
-}
-function posLabel(p) {
-  return p ? t("pos_" + p) : "";
-}
-
-function renderWords() {
-  var list = activeWords().filter(matches).sort(function (a, b) { return a.no - b.no; });
-  var total = activeWords().length;
-  var today = activeWords().filter(function (w) {
-    return w.created && daysSince(w.created) < 1;
-  }).length;
-  var recentCount = activeWords().filter(function (w) {
-    return w.created && (Date.now() - w.created) / 86400000 <= 7;
-  }).length;
-  var newCount = activeWords().filter(function (w) { return !w.practiced; }).length;
-  var wrongCount = activeWords().filter(function (w) { return w.wrongCount && w.wrongCount > 0; }).length;
-
-  var html = "";
-
-  html += '<div class="stats">';
-  html += '<div class="stat"><span class="n">' + total + '</span><span class="l">' + t("total") + '</span></div>';
-  html += '<div class="stat"><span class="n">' + today + '</span><span class="l">' + t("today") + '</span></div>';
-  html += '</div>';
-
-  if (total > 0) {
-    var b = lastBackup;
-    if (!b) {
-      html += '<div class="banner warn"><span>' + t("backupNever") + ' — ' + t("backupNeverSub") + '</span><button data-act="backup-now">' + t("backupNow") + '</button></div>';
-    } else if (daysSince(b) > 7) {
-      html += '<div class="banner warn"><span>' + t("backupOld", { n: daysSince(b) }) + '</span><button data-act="backup-now">' + t("backupNow") + '</button></div>';
-    }
+  function trashWords() {
+    return words.filter(function (w) { return w.deleted; })
+      .sort(function (a, b) { return a.deleted - b.deleted; });
   }
+  function matches(w) {
+    if (filterPos && w.pos !== filterPos) return false;
+    if (filterSource === "recent") {
+      if (!w.created) return false;
+      if ((Date.now() - w.created) / 86400000 > 7) return false;
+    } else if (filterSource === "new") {
+      if (w.practiced) return false;
+    } else if (filterSource === "wrong") {
+      if (!w.wrongCount || w.wrongCount < 1) return false;
+    }
+    if (!query) return true;
+    var q = query.toLowerCase();
+    return (w.en && w.en.toLowerCase().indexOf(q) > -1) ||
+      (w.bn && w.bn.join(" ").toLowerCase().indexOf(q) > -1) ||
+      (w.syn && w.syn.join(" ").toLowerCase().indexOf(q) > -1) ||
+      (w.ant && w.ant.join(" ").toLowerCase().indexOf(q) > -1) ||
+      (w.note && w.note.toLowerCase().indexOf(q) > -1);
+  }
+  function posLabel(p) { return p ? t("pos_" + p) : ""; }
 
-  html += '<div class="searchbar"><input id="search" type="search" placeholder="' + esc(t("search")) + '" value="' + esc(query) + '" autocomplete="off"></div>';
+  function renderWords() {
+    var list = activeWords().filter(matches).sort(function (a, b) { return a.no - b.no; });
+    var total = activeWords().length;
+    var today = activeWords().filter(function (w) { return w.created && daysSince(w.created) < 1; }).length;
+    var recentCount = activeWords().filter(function (w) { return w.created && (Date.now() - w.created) / 86400000 <= 7; }).length;
+    var newCount = activeWords().filter(function (w) { return !w.practiced; }).length;
+    var wrongCount = activeWords().filter(function (w) { return w.wrongCount && w.wrongCount > 0; }).length;
 
-  if (total > 0) {
-    html += '<div class="chips">';
-    html += '<button data-source="" class="' + (filterSource === "" ? "on" : "") + '">' + t("all") + '</button>';
-    if (recentCount > 0) {
-      html += '<button data-source="recent" class="' + (filterSource === "recent" ? "on" : "") + '">' + t("recent") + ' (' + recentCount + ')</button>';
-    }
-    if (newCount > 0) {
-      html += '<button data-source="new" class="' + (filterSource === "new" ? "on" : "") + '">' + t("new_words") + ' (' + newCount + ')</button>';
-    }
-    if (wrongCount > 0) {
-      html += '<button data-source="wrong" class="' + (filterSource === "wrong" ? "on" : "") + '">' + t("wrong_words") + ' (' + wrongCount + ')</button>';
-    }
-    POS.slice(1).forEach(function (p) {
-      var count = activeWords().filter(function (w) { return w.pos === p; }).length;
-      if (count === 0) return;
-      html += '<button data-filter="' + p + '" class="' + (filterPos === p ? "on" : "") + '">' + posLabel(p) + ' (' + count + ')</button>';
-    });
+    var html = "";
+
+    html += '<div class="stats">';
+    html += '<div class="stat"><span class="n">' + total + '</span><span class="l">' + t("total") + '</span></div>';
+    html += '<div class="stat"><span class="n">' + today + '</span><span class="l">' + t("today") + '</span></div>';
     html += '</div>';
+
+    if (total > 0) {
+      var b = lastBackup;
+      if (!b) {
+        html += '<div class="banner warn"><span>' + t("backupNever") + ' — ' + t("backupNeverSub") + '</span><button data-act="backup-now">' + t("backupNow") + '</button></div>';
+      } else if (daysSince(b) > 7) {
+        html += '<div class="banner warn"><span>' + t("backupOld", { n: daysSince(b) }) + '</span><button data-act="backup-now">' + t("backupNow") + '</button></div>';
+      }
+    }
+
+    html += '<div class="searchbar"><input id="search" type="search" placeholder="' + esc(t("search")) + '" value="' + esc(query) + '" autocomplete="off"></div>';
+
+    if (total > 0) {
+      html += '<div class="chips">';
+      html += '<button data-source="" class="' + (filterSource === "" ? "on" : "") + '">' + t("all") + '</button>';
+      if (recentCount > 0) html += '<button data-source="recent" class="' + (filterSource === "recent" ? "on" : "") + '">' + t("recent") + ' (' + recentCount + ')</button>';
+      if (newCount > 0) html += '<button data-source="new" class="' + (filterSource === "new" ? "on" : "") + '">' + t("new_words") + ' (' + newCount + ')</button>';
+      if (wrongCount > 0) html += '<button data-source="wrong" class="' + (filterSource === "wrong" ? "on" : "") + '">' + t("wrong_words") + ' (' + wrongCount + ')</button>';
+      POS.slice(1).forEach(function (p) {
+        var count = activeWords().filter(function (w) { return w.pos === p; }).length;
+        if (count === 0) return;
+        html += '<button data-filter="' + p + '" class="' + (filterPos === p ? "on" : "") + '">' + posLabel(p) + ' (' + count + ')</button>';
+      });
+      html += '</div>';
+    }
+
+    if (!total) html += emptyState("noWords", "noWordsSub");
+    else if (!list.length) html += emptyState("noMatch", "");
+    else html += list.map(renderWordCard).join("");
+
+    $("app").innerHTML = '<section class="view">' + html + '</section>';
+    setTitle(t("words"));
+    setActiveNav("words");
+    showFab(true);
+    showBack(false);
   }
 
-  if (!total) {
-    html += emptyState("noWords", "noWordsSub");
-  } else if (!list.length) {
-    html += emptyState("noMatch", "");
-  } else {
-    html += list.map(renderWordCard).join("");
-  }
-
-  $("app").innerHTML = '<section class="view">' + html + '</section>';
-  setTitle(t("words"));
-  setActiveNav("words");
-  showFab(true);
-  showBack(false);
-}
-
-function renderWordCard(w) {
-  var h = '<article class="card">';
-  h += '<div class="card-head">';
-  h += '<div>';
-  h += '<span class="card-num">#' + w.no + '</span>';
-  h += '<span class="card-en">' + esc(w.en) + '</span>';
-  h += '</div>';
-  if (w.pos) h += '<span class="card-pos">' + esc(posLabel(w.pos)) + '</span>';
-  h += '</div>';
-  if (w.bn && w.bn.length) {
-    h += '<div class="card-bn">' + esc(w.bn.join(", ")) + '</div>';
-  }
-  if (w.syn && w.syn.length) {
-    h += '<div class="card-meta"><b>' + t("synonyms") + ':</b> ' + esc(w.syn.join(", ")) + '</div>';
-  }
-  if (w.ant && w.ant.length) {
-    h += '<div class="card-meta"><b>' + t("antonyms") + ':</b> ' + esc(w.ant.join(", ")) + '</div>';
-  }
-  if (w.ex) {
-    h += '<div class="card-ex">' + esc(w.ex) + '</div>';
-  }
-  if (w.note) {
-    h += '<div class="card-meta"><b>' + t("notes") + ':</b> ' + esc(w.note) + '</div>';
-  }
-  h += '<div class="card-actions">';
-  h += '<button data-act="edit" data-id="' + w.id + '">' + t("edit") + '</button>';
-  h += '<button data-act="del" data-id="' + w.id + '" class="danger">' + t("del") + '</button>';
-  h += '</div>';
-  h += '</article>';
-  return h;
-}
-
-function emptyState(titleKey, subKey) {
-  return '<div class="empty">' +
-    '<svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.5">' +
-    '<path d="M4 4h16v16H4z"/><path d="M8 10h8M8 14h5"/></svg>' +
-    '<p class="title">' + t(titleKey) + '</p>' +
-    (subKey ? '<p>' + t(subKey) + '</p>' : '') +
-    '</div>';
-}
-
-function renderForm() {
-  var w = editingId ? getWord(editingId) : null;
-  var isEdit = !!w;
-  var data = w || { en: "", bn: [], syn: [], ant: [], pos: "", ex: "", note: "" };
-
-  var h = '<section class="view form">';
-
-  h += '<label for="f_en">' + t("en_word") + '</label>';
-  h += '<input id="f_en" type="text" value="' + esc(data.en) + '" autocomplete="off" autocapitalize="off" spellcheck="false">';
-
-  h += '<label for="f_bn">' + t("bn_meaning") + '</label>';
-  h += '<input id="f_bn" type="text" value="' + esc(data.bn.join(", ")) + '" autocomplete="off">';
-  h += '<div class="hint">' + t("bn_hint") + '</div>';
-
-  h += '<label for="f_pos">' + t("pos") + ' <span class="muted">(' + t("optional") + ')</span></label>';
-  h += '<select id="f_pos">';
-  POS.forEach(function (p) {
-    h += '<option value="' + p + '"' + (p === data.pos ? " selected" : "") + '>' + (p ? posLabel(p) : t("pos_none")) + '</option>';
-  });
-  h += '</select>';
-
-  h += '<label for="f_syn">' + t("synonyms") + ' <span class="muted">(' + t("optional") + ')</span></label>';
-  h += '<input id="f_syn" type="text" value="' + esc(data.syn.join(", ")) + '" autocomplete="off">';
-
-  h += '<label for="f_ant">' + t("antonyms") + ' <span class="muted">(' + t("optional") + ')</span></label>';
-  h += '<input id="f_ant" type="text" value="' + esc(data.ant.join(", ")) + '" autocomplete="off">';
-
-  h += '<label for="f_ex">' + t("example") + ' <span class="muted">(' + t("optional") + ')</span></label>';
-  h += '<textarea id="f_ex" rows="2">' + esc(data.ex) + '</textarea>';
-
-  h += '<label for="f_note">' + t("notes") + ' <span class="muted">(' + t("optional") + ')</span></label>';
-  h += '<textarea id="f_note" rows="2">' + esc(data.note) + '</textarea>';
-
-  h += '<div class="form-actions">';
-  h += '<button type="button" data-act="form-cancel" class="btn-secondary">' + t("cancel") + '</button>';
-  h += '<button type="button" data-act="form-save" class="btn-primary">' + (isEdit ? t("saveChanges") : t("save")) + '</button>';
-  h += '</div>';
-
-  h += '</section>';
-
-  $("app").innerHTML = h;
-  setTitle(isEdit ? t("edit") : t("add"));
-  showFab(false);
-  showBack(true);
-
-  var first = $("f_en");
-  if (first) setTimeout(function () { first.focus(); }, 100);
-}
-
-function renderTrash() {
-  var list = trashWords();
-
-  var h = '<section class="view">';
-
-  if (!list.length) {
-    h += emptyState("emptyTrash", "emptyTrashSub");
-  } else {
-    h += '<p class="muted" style="margin:0 0 14px;font-size:0.85rem">' + t("trashHint") + '</p>';
-    h += list.map(function (w) {
-      var d = daysSince(w.deleted);
-      var label = d < 1 ? t("today") : t("backupOld", { n: d }).replace(/^.*?: /, "");
-      return '<article class="card">' +
-        '<div class="card-head"><div>' +
-        '<span class="card-num">#' + w.no + '</span>' +
-        '<span class="card-en">' + esc(w.en) + '</span>' +
-        '</div></div>' +
-        '<div class="card-bn">' + esc(w.bn.join(", ")) + '</div>' +
-        '<div class="card-meta"><b>' + t("del") + ':</b> ' + esc(label) + '</div>' +
-        '<div class="card-actions">' +
-        '<button data-act="restore" data-id="' + w.id + '">' + t("restore") + '</button>' +
-        '<button data-act="del-forever" data-id="' + w.id + '" class="danger">' + t("delForever") + '</button>' +
-        '</div></article>';
-    }).join("");
-    h += '<div style="margin-top:20px"><button type="button" data-act="empty-trash" class="btn-secondary" style="width:100%;padding:14px;border-radius:14px;font-weight:700">Empty trash</button></div>';
-  }
-  h += '</section>';
-
-  $("app").innerHTML = h;
-  setTitle(t("trash"));
-  setActiveNav("trash");
-  showFab(false);
-  showBack(false);
-}
-
-function renderTools() {
-  var h = '<section class="view">';
-
-  // History section
-  h += '<div class="section">';
-  h += '<h2>' + t("historyTitle") + '</h2>';
-  h += '<p class="desc">' + t("historyDesc") + '</p>';
-  h += '<div class="row">';
-  h += '<button data-act="open-history" class="primary">' + t("historyTitle") + '</button>';
-  h += '</div>';
-  h += '</div>';
-
-  // Export section
-  h += '<div class="section">';
-  h += '<h2>' + t("exportTitle") + '</h2>';
-  h += '<p class="desc">' + t("exportDesc") + '</p>';
-  h += '<div class="row">';
-  h += '<button data-act="export-json">' + t("backupJson") + '</button>';
-  h += '<button data-act="export-csv">' + t("exportCsv") + '</button>';
-  h += '</div>';
-  if (exportBuf.text) {
-    h += '<textarea id="export-out" readonly rows="6">' + esc(exportBuf.text) + '</textarea>';
-    h += '<div class="row" style="margin-top:10px">';
-    h += '<button data-act="copy-export" class="primary">' + t("copy") + '</button>';
-    h += '<button data-act="download-export">' + t("download") + '</button>';
+  function renderWordCard(w) {
+    var h = '<article class="card">';
+    h += '<div class="card-head"><div>';
+    h += '<span class="card-num">#' + w.no + '</span>';
+    h += '<span class="card-en">' + esc(w.en) + '</span>';
     h += '</div>';
+    if (w.pos) h += '<span class="card-pos">' + esc(posLabel(w.pos)) + '</span>';
+    h += '</div>';
+    if (w.bn && w.bn.length) h += '<div class="card-bn">' + esc(w.bn.join(", ")) + '</div>';
+    if (w.syn && w.syn.length) h += '<div class="card-meta"><b>' + t("synonyms") + ':</b> ' + esc(w.syn.join(", ")) + '</div>';
+    if (w.ant && w.ant.length) h += '<div class="card-meta"><b>' + t("antonyms") + ':</b> ' + esc(w.ant.join(", ")) + '</div>';
+    if (w.ex) h += '<div class="card-ex">' + esc(w.ex) + '</div>';
+    if (w.note) h += '<div class="card-meta"><b>' + t("notes") + ':</b> ' + esc(w.note) + '</div>';
+    h += '<div class="card-actions">';
+    h += '<button data-act="edit" data-id="' + w.id + '">' + t("edit") + '</button>';
+    h += '<button data-act="del" data-id="' + w.id + '" class="danger">' + t("del") + '</button>';
+    h += '</div></article>';
+    return h;
   }
-  h += '</div>';
 
-  // Import section
-  h += '<div class="section">';
-  h += '<h2>' + t("importTitle") + '</h2>';
-  h += '<p class="desc">' + t("importDesc") + '</p>';
-  h += '<textarea id="import-in" rows="5" placeholder="' + esc(t("importPlaceholder")) + '"></textarea>';
-  h += '<label style="display:block;margin:10px 0 6px;font-size:0.85rem">';
-  h += '<input type="file" id="file-in" accept=".json,.csv,.txt" style="width:100%;padding:8px;font-size:0.85rem">';
-  h += '</label>';
-  h += '<label style="display:flex;align-items:center;gap:8px;font-size:0.9rem;margin:10px 0">';
-  h += '<input type="checkbox" id="replace-in" style="width:auto"> ' + t("replaceAll");
-  h += '</label>';
-  h += '<div class="row">';
-  h += '<button data-act="import-do" class="primary">' + t("importBtn") + '</button>';
-  h += '</div>';
-  h += '</div>';
+  function emptyState(titleKey, subKey) {
+    return '<div class="empty">' +
+      '<svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.5">' +
+      '<path d="M4 4h16v16H4z"/><path d="M8 10h8M8 14h5"/></svg>' +
+      '<p class="title">' + t(titleKey) + '</p>' +
+      (subKey ? '<p>' + t(subKey) + '</p>' : '') + '</div>';
+  }
 
-  h += '</section>';
+  function renderForm() {
+    var w = editingId ? getWord(editingId) : null;
+    var isEdit = !!w;
+    var data = w || { en: "", bn: [], syn: [], ant: [], pos: "", ex: "", note: "" };
 
-  $("app").innerHTML = h;
-  setTitle(t("tools"));
-  setActiveNav("tools");
-  showFab(false);
-  showBack(false);
+    var h = '<section class="view form">';
+    h += '<label for="f_en">' + t("en_word") + '</label>';
+    h += '<input id="f_en" type="text" value="' + esc(data.en) + '" autocomplete="off" autocapitalize="off" spellcheck="false">';
+    h += '<label for="f_bn">' + t("bn_meaning") + '</label>';
+    h += '<input id="f_bn" type="text" value="' + esc(data.bn.join(", ")) + '" autocomplete="off">';
+    h += '<div class="hint">' + t("bn_hint") + '</div>';
+    h += '<label for="f_pos">' + t("pos") + ' <span class="muted">(' + t("optional") + ')</span></label>';
+    h += '<select id="f_pos">';
+    POS.forEach(function (p) {
+      h += '<option value="' + p + '"' + (p === data.pos ? " selected" : "") + '>' + (p ? posLabel(p) : t("pos_none")) + '</option>';
+    });
+    h += '</select>';
+    h += '<label for="f_syn">' + t("synonyms") + ' <span class="muted">(' + t("optional") + ')</span></label>';
+    h += '<input id="f_syn" type="text" value="' + esc(data.syn.join(", ")) + '" autocomplete="off">';
+    h += '<label for="f_ant">' + t("antonyms") + ' <span class="muted">(' + t("optional") + ')</span></label>';
+    h += '<input id="f_ant" type="text" value="' + esc(data.ant.join(", ")) + '" autocomplete="off">';
+    h += '<label for="f_ex">' + t("example") + ' <span class="muted">(' + t("optional") + ')</span></label>';
+    h += '<textarea id="f_ex" rows="2">' + esc(data.ex) + '</textarea>';
+    h += '<label for="f_note">' + t("notes") + ' <span class="muted">(' + t("optional") + ')</span></label>';
+    h += '<textarea id="f_note" rows="2">' + esc(data.note) + '</textarea>';
+    h += '<div class="form-actions">';
+    h += '<button type="button" data-act="form-cancel" class="btn-secondary">' + t("cancel") + '</button>';
+    h += '<button type="button" data-act="form-save" class="btn-primary">' + (isEdit ? t("saveChanges") : t("save")) + '</button>';
+    h += '</div></section>';
 
-  var fileInput = $("file-in");
-  if (fileInput) {
-    fileInput.addEventListener("change", function (e) {
-      var f = e.target.files && e.target.files[0];
-      if (!f) return;
-      var r = new FileReader();
-      r.onload = function () { $("import-in").value = r.result; };
-      r.readAsText(f);
+    $("app").innerHTML = h;
+    setTitle(isEdit ? t("edit") : t("add"));
+    showFab(false);
+    showBack(true);
+    var first = $("f_en");
+    if (first) setTimeout(function () { first.focus(); }, 100);
+  }
+
+  function renderTrash() {
+    var list = trashWords();
+    var h = '<section class="view">';
+    if (!list.length) {
+      h += emptyState("emptyTrash", "emptyTrashSub");
+    } else {
+      h += '<p class="muted" style="margin:0 0 14px;font-size:0.85rem">' + t("trashHint") + '</p>';
+      h += list.map(function (w) {
+        var d = daysSince(w.deleted);
+        var label = d < 1 ? t("today") : t("backupOld", { n: d }).replace(/^.*?: /, "");
+        return '<article class="card"><div class="card-head"><div>' +
+          '<span class="card-num">#' + w.no + '</span>' +
+          '<span class="card-en">' + esc(w.en) + '</span></div></div>' +
+          '<div class="card-bn">' + esc(w.bn.join(", ")) + '</div>' +
+          '<div class="card-meta"><b>' + t("del") + ':</b> ' + esc(label) + '</div>' +
+          '<div class="card-actions">' +
+          '<button data-act="restore" data-id="' + w.id + '">' + t("restore") + '</button>' +
+          '<button data-act="del-forever" data-id="' + w.id + '" class="danger">' + t("delForever") + '</button>' +
+          '</div></article>';
+      }).join("");
+      h += '<div style="margin-top:20px"><button type="button" data-act="empty-trash" class="btn-secondary" style="width:100%;padding:14px;border-radius:14px;font-weight:700">Empty trash</button></div>';
+    }
+    h += '</section>';
+    $("app").innerHTML = h;
+    setTitle(t("trash"));
+    setActiveNav("trash");
+    showFab(false);
+    showBack(false);
+  }
+
+  function renderTools() {
+    var h = '<section class="view">';
+    h += '<div class="section">';
+    h += '<h2>' + t("historyTitle") + '</h2>';
+    h += '<p class="desc">' + t("historyDesc") + '</p>';
+    h += '<div class="row"><button data-act="open-history" class="primary">' + t("historyTitle") + '</button></div>';
+    h += '</div>';
+
+    h += '<div class="section">';
+    h += '<h2>' + t("exportTitle") + '</h2>';
+    h += '<p class="desc">' + t("exportDesc") + '</p>';
+    h += '<div class="row">';
+    h += '<button data-act="export-json">' + t("backupJson") + '</button>';
+    h += '<button data-act="export-csv">' + t("exportCsv") + '</button>';
+    h += '</div>';
+    if (exportBuf.text) {
+      h += '<textarea id="export-out" readonly rows="6">' + esc(exportBuf.text) + '</textarea>';
+      h += '<div class="row" style="margin-top:10px">';
+      h += '<button data-act="copy-export" class="primary">' + t("copy") + '</button>';
+      h += '<button data-act="download-export">' + t("download") + '</button>';
+      h += '</div>';
+    }
+    h += '</div>';
+
+    h += '<div class="section">';
+    h += '<h2>' + t("importTitle") + '</h2>';
+    h += '<p class="desc">' + t("importDesc") + '</p>';
+    h += '<textarea id="import-in" rows="5" placeholder="' + esc(t("importPlaceholder")) + '"></textarea>';
+    h += '<label style="display:block;margin:10px 0 6px;font-size:0.85rem">';
+    h += '<input type="file" id="file-in" accept=".json,.csv,.txt" style="width:100%;padding:8px;font-size:0.85rem">';
+    h += '</label>';
+    h += '<label style="display:flex;align-items:center;gap:8px;font-size:0.9rem;margin:10px 0">';
+    h += '<input type="checkbox" id="replace-in" style="width:auto"> ' + t("replaceAll");
+    h += '</label>';
+    h += '<div class="row"><button data-act="import-do" class="primary">' + t("importBtn") + '</button></div>';
+    h += '</div>';
+    h += '</section>';
+
+    $("app").innerHTML = h;
+    setTitle(t("tools"));
+    setActiveNav("tools");
+    showFab(false);
+    showBack(false);
+
+    var fileInput = $("file-in");
+    if (fileInput) {
+      fileInput.addEventListener("change", function (e) {
+        var f = e.target.files && e.target.files[0];
+        if (!f) return;
+        var r = new FileReader();
+        r.onload = function () { $("import-in").value = r.result; };
+        r.readAsText(f);
+      });
+    }
+  }
+
+  function setTitle(s) { var el = $("title"); if (el) el.textContent = s; }
+  function setActiveNav(k) {
+    document.querySelectorAll(".navbtn").forEach(function (b) {
+      b.classList.toggle("active", b.dataset.nav === k);
     });
   }
-}
-
-function setTitle(s) { var el = $("title"); if (el) el.textContent = s; }
-function setActiveNav(k) {
-  document.querySelectorAll(".navbtn").forEach(function (b) {
-    b.classList.toggle("active", b.dataset.nav === k);
-  });
-}
-function showFab(show) {
-  var f = $("fab"); if (f) f.classList.toggle("hidden", !show);
-}
-function showBack(show) {
-  var b = $("back"); if (b) b.classList.toggle("hidden", !show);
-}
-function updateLangChip() {
-  var c = $("lang-toggle");
-  if (c) c.textContent = lang === "bn" ? "EN" : "বাং";
-}
+  function showFab(show) { var f = $("fab"); if (f) f.classList.toggle("hidden", !show); }
+  function showBack(show) { var b = $("back"); if (b) b.classList.toggle("hidden", !show); }
+  function updateLangChip() {
+    var c = $("lang-toggle");
+    if (c) c.textContent = lang === "bn" ? "EN" : "বাং";
+  }
   async function saveWord() {
     var en = ($("f_en").value || "").trim();
     var bn = splitList($("f_bn").value);
@@ -747,9 +713,7 @@ function updateLangChip() {
     if (!bn.length) return toast(t("needBn"));
 
     var dup = findDuplicate(en, editingId);
-    if (dup) {
-      return toast(dup.deleted ? t("dupTrash", { no: dup.no }) : t("dup", { no: dup.no }));
-    }
+    if (dup) return toast(dup.deleted ? t("dupTrash", { no: dup.no }) : t("dup", { no: dup.no }));
 
     var w;
     if (editingId) {
@@ -759,8 +723,7 @@ function updateLangChip() {
       w.ex = ex; w.note = note; w.updated = Date.now();
     } else {
       w = {
-        id: uid(),
-        no: await getNextNo(),
+        id: uid(), no: await getNextNo(),
         en: en, bn: bn, pos: pos, syn: syn, ant: ant,
         ex: ex, note: note,
         created: Date.now(), updated: Date.now(), deleted: null,
@@ -775,8 +738,7 @@ function updateLangChip() {
   }
 
   async function deleteWord(id) {
-    var ok = await confirmDialog(t("confirmDel"));
-    if (!ok) return;
+    if (!(await confirmDialog(t("confirmDel")))) return;
     var w = getWord(id);
     if (!w) return;
     w.deleted = Date.now();
@@ -799,8 +761,7 @@ function updateLangChip() {
   }
 
   async function deleteForever(id) {
-    var ok = await confirmDialog(t("confirmDelForever"));
-    if (!ok) return;
+    if (!(await confirmDialog(t("confirmDelForever")))) return;
     await dbDeleteWord(id);
     words = words.filter(function (w) { return w.id !== id; });
     toast(t("permDeleted"));
@@ -808,12 +769,9 @@ function updateLangChip() {
   }
 
   async function emptyTrash() {
-    var ok = await confirmDialog(t("confirmEmptyTrash"));
-    if (!ok) return;
+    if (!(await confirmDialog(t("confirmEmptyTrash")))) return;
     var trash = trashWords();
-    for (var i = 0; i < trash.length; i++) {
-      await dbDeleteWord(trash[i].id);
-    }
+    for (var i = 0; i < trash.length; i++) await dbDeleteWord(trash[i].id);
     words = words.filter(function (w) { return !w.deleted; });
     toast(t("trashEmptied"));
     render();
@@ -821,12 +779,11 @@ function updateLangChip() {
 
   function exportJson() {
     var payload = {
-      app: "vocab-mini-app",
-      version: 1,
+      app: "vocab-mini-app", version: 1,
       exported: new Date().toISOString(),
-      words: words
+      words: words, sessions: sessions, reviews: reviews
     };
-    exportBuf = { kind: "json", text: JSON.stringify(payload, null, 2) };
+    exportBuf = { kind: "json", text: JSON.stringify(payload, null, 1) };
     renderTools();
   }
   function exportCsv() {
@@ -859,16 +816,10 @@ function updateLangChip() {
       var url = URL.createObjectURL(blob);
       var a = document.createElement("a");
       a.href = url; a.download = name;
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(function () {
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }, 500);
+      document.body.appendChild(a); a.click();
+      setTimeout(function () { document.body.removeChild(a); URL.revokeObjectURL(url); }, 500);
       markBackup();
-    } catch (e) {
-      copyExport();
-    }
+    } catch (e) { copyExport(); }
   }
   async function markBackup() {
     lastBackup = Date.now();
@@ -879,14 +830,9 @@ function updateLangChip() {
     var text = ($("import-in").value || "").trim();
     if (!text) return;
     var replace = $("replace-in").checked;
-
     if (text.charAt(0) === "{") {
-      try {
-        var obj = JSON.parse(text);
-        await restoreFromJson(obj, replace);
-      } catch (e) {
-        toast(t("badInput"));
-      }
+      try { await restoreFromJson(JSON.parse(text), replace); }
+      catch (e) { toast(t("badInput")); }
     } else {
       await importLines(text);
     }
@@ -895,29 +841,19 @@ function updateLangChip() {
 
   async function importLines(text) {
     var lines = text.split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean);
-    if (lines.length && /^(english|en|word)\b/i.test(lines[0]) && lines[0].indexOf(",") > -1) {
-      lines.shift();
-    }
+    if (lines.length && /^(english|en|word)\b/i.test(lines[0]) && lines[0].indexOf(",") > -1) lines.shift();
     var added = 0, skipped = 0;
     for (var i = 0; i < lines.length; i++) {
       var line = lines[i];
       var m = line.match(/^(.+?)\s*[-–—]\s*(.+)$/);
       var en, bnText;
-      if (m) {
-        en = m[1].trim();
-        bnText = m[2].trim();
-      } else {
-        var parts = parseCsvLine(line);
-        en = (parts[0] || "").trim();
-        bnText = parts[1] || "";
-      }
+      if (m) { en = m[1].trim(); bnText = m[2].trim(); }
+      else { var parts = parseCsvLine(line); en = (parts[0] || "").trim(); bnText = parts[1] || ""; }
       var bn = splitList(bnText);
       if (!en || !bn.length || findDuplicate(en)) { skipped++; continue; }
       var w = {
-        id: uid(),
-        no: await getNextNo(),
-        en: en, bn: bn,
-        syn: [], ant: [], pos: "", ex: "", note: "",
+        id: uid(), no: await getNextNo(),
+        en: en, bn: bn, syn: [], ant: [], pos: "", ex: "", note: "",
         created: Date.now(), updated: Date.now(), deleted: null,
         practiced: false, correctCount: 0, wrongCount: 0
       };
@@ -934,10 +870,8 @@ function updateLangChip() {
     for (var i = 0; i < line.length; i++) {
       var c = line[i];
       if (inQ) {
-        if (c === '"') {
-          if (line[i + 1] === '"') { cur += '"'; i++; }
-          else inQ = false;
-        } else cur += c;
+        if (c === '"') { if (line[i + 1] === '"') { cur += '"'; i++; } else inQ = false; }
+        else cur += c;
       } else if (c === '"') inQ = true;
       else if (c === ",") { out.push(cur); cur = ""; }
       else cur += c;
@@ -948,22 +882,17 @@ function updateLangChip() {
 
   async function restoreFromJson(obj, replace) {
     if (!obj || !Array.isArray(obj.words)) return toast(t("badInput"));
-
-    var incoming = obj.words.filter(function (w) {
-      return w && w.id && w.en && Array.isArray(w.bn);
-    }).map(function (w) {
-      return Object.assign({
-        syn: [], ant: [], pos: "", ex: "", note: "",
-        created: Date.now(), updated: 0, deleted: null,
-        practiced: false, correctCount: 0, wrongCount: 0
-      }, w);
-    });
-
+    var incoming = obj.words.filter(function (w) { return w && w.id && w.en && Array.isArray(w.bn); })
+      .map(function (w) {
+        return Object.assign({
+          syn: [], ant: [], pos: "", ex: "", note: "",
+          created: Date.now(), updated: 0, deleted: null,
+          practiced: false, correctCount: 0, wrongCount: 0
+        }, w);
+      });
     if (replace) {
-      var c1 = await confirmDialog(t("confirmReplace1"));
-      if (!c1) return;
-      var c2 = await confirmDialog(t("confirmReplace2"));
-      if (!c2) return;
+      if (!(await confirmDialog(t("confirmReplace1")))) return;
+      if (!(await confirmDialog(t("confirmReplace2")))) return;
       await dbClearWords();
       words = incoming;
       await dbPutWords(words);
@@ -971,11 +900,9 @@ function updateLangChip() {
       toast(t("restoreResult", { a: incoming.length, u: 0, s: 0 }));
       return;
     }
-
     var added = 0, updated = 0, skipped = 0;
     var usedNo = {};
     words.forEach(function (w) { if (w.no) usedNo[w.no] = true; });
-
     for (var i = 0; i < incoming.length; i++) {
       var inc = incoming[i];
       var cur = getWord(inc.id);
@@ -1005,28 +932,27 @@ function updateLangChip() {
     query = "";
     if (v === "words") renderWords();
     else if (v === "practice") {
-      if (window.Practice && window.Practice.open) {
-        window.Practice.open();
-      } else {
-        $("app").innerHTML = '<section class="view"><div class="empty"><p class="title">' + t("practiceComingSoon") + '</p><p>' + t("practiceComingSoonSub") + '</p></div></section>';
-        setTitle(t("practice"));
-        setActiveNav("practice");
-        showFab(false);
-        showBack(false);
+      if (window.Practice && window.Practice.open) window.Practice.open();
+      else {
+        $("app").innerHTML = '<section class="view"><div class="empty"><p class="title">' + t("practiceComingSoon") + '</p></div></section>';
+        setTitle(t("practice")); setActiveNav("practice"); showFab(false); showBack(false);
+      }
+    }
+    else if (v === "stats") {
+      if (window.Stats && window.Stats.open) window.Stats.open();
+      else {
+        $("app").innerHTML = '<section class="view"><div class="empty"><p class="title">' + t("statsTitle") + '</p></div></section>';
+        setTitle(t("statsTitle")); setActiveNav("stats"); showFab(false); showBack(false);
       }
     }
     else if (v === "trash") renderTrash();
     else if (v === "tools") renderTools();
     else if (v === "add") renderForm();
     else if (v === "history") {
-      if (window.History && window.History.open) {
-        window.History.open();
-      } else {
+      if (window.History && window.History.open) window.History.open();
+      else {
         $("app").innerHTML = '<section class="view"><div class="empty"><p class="title">' + t("historyEmpty") + '</p></div></section>';
-        setTitle(t("historyTitle"));
-        setActiveNav("tools");
-        showFab(false);
-        showBack(true);
+        setTitle(t("historyTitle")); setActiveNav("tools"); showFab(false); showBack(true);
       }
     }
   }
@@ -1034,6 +960,7 @@ function updateLangChip() {
   function render() {
     if (view === "words") renderWords();
     else if (view === "practice") go("practice");
+    else if (view === "stats") go("stats");
     else if (view === "trash") renderTrash();
     else if (view === "tools") renderTools();
     else if (view === "add") renderForm();
@@ -1045,11 +972,7 @@ function updateLangChip() {
     if (nav) return go(nav.dataset.nav);
 
     var filt = e.target.closest("[data-filter]");
-    if (filt) {
-      filterPos = filt.dataset.filter;
-      renderWords();
-      return;
-    }
+    if (filt) { filterPos = filt.dataset.filter; renderWords(); return; }
 
     var src = e.target.closest("[data-source]");
     if (src) {
@@ -1087,16 +1010,11 @@ function updateLangChip() {
       var pos = e.target.selectionStart;
       var list = activeWords().filter(matches).sort(function (a, b) { return a.no - b.no; });
       var container = e.target.parentElement.parentElement;
-      var cardsHtml = list.length
-        ? list.map(renderWordCard).join("")
-        : emptyState("noMatch", "");
+      var cardsHtml = list.length ? list.map(renderWordCard).join("") : emptyState("noMatch", "");
       var oldCards = container.querySelectorAll(".card, .empty");
       oldCards.forEach(function (el) { el.remove(); });
       container.insertAdjacentHTML("beforeend", cardsHtml);
-      if (focus) {
-        e.target.focus();
-        try { e.target.setSelectionRange(pos, pos); } catch (x) {}
-      }
+      if (focus) { e.target.focus(); try { e.target.setSelectionRange(pos, pos); } catch (x) {} }
     }
   });
 
@@ -1118,6 +1036,9 @@ function updateLangChip() {
       words = allWords || [];
       var allSessions = await dbGetAllSessions();
       sessions = (allSessions || []).sort(function (a, b) { return b.date - a.date; });
+      var allReviews = await dbGetAllReviews();
+      reviews = {};
+      (allReviews || []).forEach(function (r) { if (r && r.wordId) reviews[r.wordId] = r; });
       lastBackup = (await metaGet("lastBackup")) || 0;
 
       if (!words.length && (await metaGet("nextNo")) === undefined) {
@@ -1137,10 +1058,7 @@ function updateLangChip() {
     }
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
-  } else {
-    init();
-  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
 
 })();
