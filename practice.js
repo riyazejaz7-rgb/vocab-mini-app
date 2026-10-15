@@ -1,24 +1,13 @@
-/* ============================================================
-   Vocabulary Mini App — practice.js
-   Phase 3a: Practice Mode + Range filter
-   Depends on: main.js (window.VocabMain)
-   ============================================================ */
-
 (function () {
   "use strict";
 
   var M = window.VocabMain;
-  if (!M) {
-    console.error("practice.js: VocabMain not available");
-    return;
-  }
+  if (!M) { console.error("practice.js: VocabMain not available"); return; }
 
   var t = M.t;
   var esc = M.esc;
-  var uid = M.uid;
   var toast = M.toast;
 
-  /* ---------- State ---------- */
   var setup = {
     mode: "bn_en",
     count: 10,
@@ -28,8 +17,11 @@
   };
 
   var session = null;
+  var timerHandle = null;
+  var idleHandle = null;
 
-  /* ---------- Helpers ---------- */
+  var IDLE_MS = 2 * 60 * 1000;
+
   function getActiveWords() {
     return M.words.filter(function (w) { return !w.deleted; });
   }
@@ -43,9 +35,7 @@
     } else if (setup.source === "range") {
       var from = setup.rangeFrom || 1;
       var to = setup.rangeTo || 99999;
-      pool = pool.filter(function (w) {
-        return w.no >= from && w.no <= to;
-      });
+      pool = pool.filter(function (w) { return w.no >= from && w.no <= to; });
     }
     return pool;
   }
@@ -55,7 +45,6 @@
     if (!active.length) return [];
     var maxNo = active.reduce(function (a, w) { return Math.max(a, w.no || 0); }, 0);
     if (maxNo < 1) return [];
-
     var buttons = [];
     var step = 20;
     for (var start = 1; start <= maxNo; start += step) {
@@ -65,17 +54,21 @@
     return buttons;
   }
 
-  /* ---------- Setup screen ---------- */
+  function fmtTime(ms) {
+    var total = Math.floor(ms / 1000);
+    var m = Math.floor(total / 60);
+    var s = total % 60;
+    return (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+  }
+
   function renderSetup() {
     var total = getActiveWords().length;
     var notEnough = total < 4;
     var sourceWords = getSourceWords();
-    var rangeValid = setup.source !== "range" || sourceWords.length >= 1;
 
     var h = '<section class="view">';
     h += '<div class="practice-setup">';
 
-    // Mode
     h += '<div class="setup-section">';
     h += '<p class="setup-label">' + t("mode") + '</p>';
     h += '<div class="setup-options">';
@@ -84,7 +77,6 @@
     h += '</div>';
     h += '</div>';
 
-    // Count
     h += '<div class="setup-section">';
     h += '<p class="setup-label">' + t("questionCount") + '</p>';
     h += '<div class="setup-options">';
@@ -94,7 +86,6 @@
     h += '</div>';
     h += '</div>';
 
-    // Source
     h += '<div class="setup-section">';
     h += '<p class="setup-label">' + t("wordSource") + '</p>';
     h += '<div class="setup-options">';
@@ -104,7 +95,6 @@
     h += '<button type="button" class="opt-btn' + (setup.source === "range" ? " on" : "") + '" data-set="source" data-val="range">' + t("source_range") + '</button>';
     h += '</div>';
 
-    // Range sub-section
     if (setup.source === "range") {
       var rangeBtns = getRangeButtons();
       h += '<div style="margin-top:12px">';
@@ -116,7 +106,6 @@
       });
       h += '</div>';
 
-      // Custom inputs
       h += '<div style="display:flex;gap:10px;margin-top:12px">';
       h += '<div style="flex:1"><label style="display:block;font-size:0.75rem;color:var(--text-muted);margin-bottom:4px">' + t("rangeFrom") + '</label>';
       h += '<input id="range-from" type="number" min="1" value="' + (setup.rangeFrom || 1) + '" class="answer-input" style="text-align:center;padding:10px 12px;font-size:1rem"></div>';
@@ -124,14 +113,12 @@
       h += '<input id="range-to" type="number" min="1" value="' + (setup.rangeTo || 20) + '" class="answer-input" style="text-align:center;padding:10px 12px;font-size:1rem"></div>';
       h += '</div>';
 
-      var count = sourceWords.length;
-      h += '<p style="font-size:0.85rem;color:var(--text-muted);margin:10px 0 0;text-align:center">' + count + ' ' + t("rangeWordsFound") + '</p>';
+      h += '<p style="font-size:0.85rem;color:var(--text-muted);margin:10px 0 0;text-align:center">' + sourceWords.length + ' ' + t("rangeWordsFound") + '</p>';
       h += '</div>';
     }
 
     h += '</div>';
 
-    // Start
     h += '<button type="button" class="practice-start" ' + (notEnough ? "disabled" : "") + ' data-act="practice-start">' + t("startPractice") + '</button>';
 
     if (notEnough) {
@@ -147,7 +134,6 @@
     M.showFab(false);
     M.showBack(false);
 
-    // Range input listeners
     var fromInp = document.getElementById("range-from");
     var toInp = document.getElementById("range-to");
     if (fromInp) {
@@ -172,17 +158,13 @@
     }
   }
 
-  /* ---------- Session ---------- */
   function startSession() {
     var pool = getSourceWords();
-
-    if (pool.length < 1) {
-      toast(t("notEnoughWords"));
-      return;
-    }
+    if (pool.length < 4) { toast(t("notEnoughWords")); return; }
 
     var shuffled = pool.slice().sort(function () { return Math.random() - 0.5; });
     var picked = shuffled.slice(0, Math.min(setup.count, shuffled.length));
+    var now = Date.now();
 
     session = {
       mode: setup.mode,
@@ -190,12 +172,74 @@
       current: 0,
       answers: [],
       answered: false,
-      userAnswer: ""
+      userAnswer: "",
+      startedAt: now,
+      questionStartAt: now,
+      elapsedMs: 0,
+      paused: false,
+      pauseStartedAt: 0,
+      totalPausedMs: 0
     };
 
+    startTimer();
     renderQuestion();
   }
 
+  function startTimer() {
+    stopTimer();
+    if (!session) return;
+    session.lastTickAt = Date.now();
+    timerHandle = setInterval(function () {
+      if (!session || session.paused) return;
+      var now = Date.now();
+      var delta = now - session.lastTickAt;
+      session.lastTickAt = now;
+      session.elapsedMs += delta;
+      updateTimerDisplay();
+    }, 250);
+    resetIdle();
+  }
+
+  function stopTimer() {
+    if (timerHandle) { clearInterval(timerHandle); timerHandle = null; }
+    if (idleHandle) { clearTimeout(idleHandle); idleHandle = null; }
+  }
+
+  function resetIdle() {
+    if (idleHandle) clearTimeout(idleHandle);
+    idleHandle = setTimeout(function () {
+      if (session && !session.paused && !session.answered) {
+        doPause(true);
+      }
+    }, IDLE_MS);
+  }
+
+  function updateTimerDisplay() {
+    var el = document.getElementById("timer");
+    if (el && session) el.textContent = fmtTime(session.elapsedMs);
+    var pe = document.getElementById("timer-paused");
+    if (pe) pe.classList.toggle("hidden", !session.paused);
+  }
+
+  function doPause(auto) {
+    if (!session || session.paused || session.answered) return;
+    session.paused = true;
+    session.pauseStartedAt = Date.now();
+    if (auto) toast(t("pausedAuto"));
+    else toast(t("paused"));
+    renderQuestion();
+  }
+
+  function doResume() {
+    if (!session || !session.paused) return;
+    session.totalPausedMs += Date.now() - session.pauseStartedAt;
+    session.paused = false;
+    session.pauseStartedAt = 0;
+    session.lastTickAt = Date.now();
+    resetIdle();
+    toast(t("resumed"));
+    renderQuestion();
+  }
   function currentWord() {
     return session.questions[session.current];
   }
@@ -251,7 +295,20 @@
     var h = '<section class="view practice-session">';
 
     h += '<div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%"></div></div>';
-    h += '<div class="q-counter"><span>' + t("questionOf", { n: n, total: total }) + '</span></div>';
+
+    h += '<div class="q-counter">';
+    h += '<span>' + t("questionOf", { n: n, total: total }) + '</span>';
+    h += '<span style="display:flex;align-items:center;gap:8px">';
+    h += '<span id="timer" style="font-family:ui-monospace,monospace;font-weight:700;color:var(--accent)">' + fmtTime(session.elapsedMs) + '</span>';
+    if (!session.answered) {
+      h += '<button type="button" data-act="practice-pause" style="background:transparent;border:1.5px solid var(--border);color:var(--text-soft);border-radius:8px;padding:4px 10px;font-size:0.75rem;font-weight:600;cursor:pointer" id="pause-btn">' + (session.paused ? "▶" : "⏸") + '</button>';
+    }
+    h += '</span>';
+    h += '</div>';
+
+    if (session.paused) {
+      h += '<div class="feedback" style="background:var(--warn-soft);color:var(--warn);border:1px solid rgba(217,119,6,0.25);text-align:center;font-weight:600">⏸ ' + t("pausedLabel") + '</div>';
+    }
 
     h += '<div class="question-card">';
     h += '<div class="question-prompt">' + esc(getQuestionLabel()) + '</div>';
@@ -263,7 +320,8 @@
     if (session.answered) {
       inputClass += session.answers[session.current].correct ? " correct" : " wrong";
     }
-    h += '<input id="answer" type="text" class="' + inputClass + '" placeholder="' + esc(t("typeYourAnswer")) + '" value="' + esc(session.userAnswer) + '" autocomplete="off" autocapitalize="off" spellcheck="false"' + (session.answered ? " readonly" : "") + '>';
+    var disabled = session.paused ? " disabled" : "";
+    h += '<input id="answer" type="text" class="' + inputClass + '" placeholder="' + esc(t("typeYourAnswer")) + '" value="' + esc(session.userAnswer) + '" autocomplete="off" autocapitalize="off" spellcheck="false"' + (session.answered || session.paused ? " readonly" : "") + disabled + '>';
     h += '</div>';
 
     if (session.answered) {
@@ -276,7 +334,9 @@
     }
 
     h += '<div class="practice-actions">';
-    if (!session.answered) {
+    if (session.paused) {
+      h += '<button type="button" class="btn-check" data-act="practice-resume">' + t("resume") + '</button>';
+    } else if (!session.answered) {
       h += '<button type="button" class="btn-check" data-act="practice-check">' + t("check") + '</button>';
     } else {
       var isLast = session.current === session.questions.length - 1;
@@ -292,12 +352,13 @@
     M.showFab(false);
     M.showBack(false);
 
-    if (!session.answered) {
+    if (!session.answered && !session.paused) {
       var inp = document.getElementById("answer");
       if (inp) {
         setTimeout(function () { inp.focus(); }, 100);
         inp.addEventListener("input", function () {
           session.userAnswer = inp.value;
+          resetIdle();
         });
         inp.addEventListener("keydown", function (e) {
           if (e.key === "Enter") {
@@ -310,15 +371,17 @@
   }
 
   function doCheck() {
-    if (session.answered) return;
+    if (session.answered || session.paused) return;
     var word = currentWord();
     var ans = session.userAnswer;
     var correct = checkAnswer(word, ans);
+    var now = Date.now();
 
     session.answers[session.current] = {
       id: word.id,
       correct: correct,
-      userAnswer: ans
+      userAnswer: ans,
+      timeMs: now - session.questionStartAt
     };
     session.answered = true;
     renderQuestion();
@@ -328,18 +391,24 @@
     session.answered = false;
     session.userAnswer = "";
     session.current++;
+    session.questionStartAt = Date.now();
 
     if (session.current >= session.questions.length) {
       finishSession();
     } else {
+      resetIdle();
       renderQuestion();
     }
   }
 
   function finishSession() {
+    stopTimer();
+
     var correct = session.answers.filter(function (a) { return a.correct; }).length;
     var total = session.questions.length;
     var pct = Math.round((correct / total) * 100);
+    var totalMs = session.elapsedMs;
+    var avgMs = Math.round(totalMs / total);
 
     var h = '<section class="view">';
     h += '<div class="result-card">';
@@ -355,6 +424,11 @@
     h += '<div class="correct"><span class="num">' + correct + '</span><span class="lbl">' + t("correctLabel") + '</span></div>';
     h += '<div class="wrong"><span class="num">' + (total - correct) + '</span><span class="lbl">' + t("wrongLabel") + '</span></div>';
     h += '<div><span class="num">' + pct + '%</span><span class="lbl">' + t("accuracy") + '</span></div>';
+    h += '</div>';
+
+    h += '<div class="result-score" style="margin-top:6px">';
+    h += '<div><span class="num" style="font-size:1.3rem">' + fmtTime(totalMs) + '</span><span class="lbl">' + t("totalTime") + '</span></div>';
+    h += '<div><span class="num" style="font-size:1.3rem">' + fmtTime(avgMs) + '</span><span class="lbl">' + t("avgTime") + '</span></div>';
     h += '</div>';
 
     h += '<div class="practice-actions" style="margin-top:24px">';
@@ -391,8 +465,8 @@
     }
   }
 
-  /* ---------- Public API ---------- */
   function open() {
+    stopTimer();
     session = null;
     renderSetup();
   }
@@ -428,8 +502,15 @@
     if (a === "practice-start") { startSession(); return true; }
     if (a === "practice-check") { doCheck(); return true; }
     if (a === "practice-next") { doNext(); return true; }
-    if (a === "practice-again") { session = null; renderSetup(); return true; }
+    if (a === "practice-pause") {
+      if (session && session.paused) doResume();
+      else doPause(false);
+      return true;
+    }
+    if (a === "practice-resume") { doResume(); return true; }
+    if (a === "practice-again") { stopTimer(); session = null; renderSetup(); return true; }
     if (a === "practice-done") {
+      stopTimer();
       session = null;
       var navWords = document.querySelector('[data-nav="words"]');
       if (navWords) navWords.click();
@@ -449,5 +530,11 @@
       e.stopPropagation();
     }
   }, true);
+
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden && session && !session.paused && !session.answered) {
+      doPause(true);
+    }
+  });
 
 })();
