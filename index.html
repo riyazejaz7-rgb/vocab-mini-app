@@ -1,22 +1,71 @@
 <!doctype html>
-<html lang="en">
+<html lang="bn">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Vocab Mini App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+  <meta name="theme-color" content="#0d9488">
+  <title>Vocabulary</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <main>
-    <h1>Vocab Mini App</h1>
-    <p class="sub">Setup check. This screen confirms the basics work before we build features.</p>
-    <noscript><p class="detail">JavaScript is turned off. This app needs it.</p></noscript>
-    <ul id="checks" aria-live="polite"></ul>
-    <button id="again" type="button">Run checks again</button>
-    <p class="foot" id="build"></p>
+  <!-- Toast / snackbar -->
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <!-- Confirm dialog (custom) -->
+  <div id="dialog" class="dialog hidden">
+    <div class="dialog-card">
+      <p id="dialog-msg"></p>
+      <div class="dialog-actions">
+        <button type="button" id="dialog-cancel" class="btn-ghost">Cancel</button>
+        <button type="button" id="dialog-ok" class="btn-danger">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top app bar -->
+  <header class="appbar">
+    <button type="button" id="back" class="iconbtn hidden" aria-label="Back">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <h1 id="title">Vocabulary</h1>
+    <button type="button" id="lang-toggle" class="chip" aria-label="Language">বাং</button>
+  </header>
+
+  <!-- Main content -->
+  <main id="app">
+    <section id="view-loading" class="view">
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+    </section>
   </main>
+
+  <!-- Bottom navigation -->
+  <nav class="bottomnav" id="bottomnav">
+    <button type="button" data-nav="words" class="navbtn active">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+      <span data-label="words">Words</span>
+    </button>
+    <button type="button" data-nav="trash" class="navbtn">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>
+      <span data-label="trash">Trash</span>
+    </button>
+    <button type="button" data-nav="tools" class="navbtn">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M3 12h18"/></svg>
+      <span data-label="tools">Tools</span>
+    </button>
+  </nav>
+
+  <!-- Floating add button -->
+  <button type="button" id="fab" class="fab" aria-label="Add word">
+    <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+  </button>
+
   <script src="config.js"></script>
-  <script src="app.js"></script>
+  <script src="main.js"></script>
 </body>
 </html>
