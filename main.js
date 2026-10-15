@@ -11,8 +11,6 @@
     } catch (e) {}
   }
 
-  var CFG = window.APP_CONFIG || {};
-
   var L = {
     en: {
       words: "Words", trash: "Trash", tools: "Tools", practice: "Practice",
@@ -74,6 +72,11 @@
       source_all: "All words",
       source_new: "New words",
       source_wrong: "Wrong words",
+      source_range: "Range",
+      rangeLabel: "Pick a range",
+      rangeFrom: "From",
+      rangeTo: "To",
+      rangeWordsFound: "words found",
       startPractice: "Start practice",
       check: "Check",
       next: "Next",
@@ -156,6 +159,11 @@
       source_all: "সব শব্দ",
       source_new: "নতুন শব্দ",
       source_wrong: "ভুল শব্দ",
+      source_range: "রেঞ্জ",
+      rangeLabel: "রেঞ্জ বেছে নিন",
+      rangeFrom: "থেকে",
+      rangeTo: "পর্যন্ত",
+      rangeWordsFound: "শব্দ পাওয়া গেছে",
       startPractice: "প্র্যাকটিস শুরু",
       check: "যাচাই",
       next: "পরবর্তী",
