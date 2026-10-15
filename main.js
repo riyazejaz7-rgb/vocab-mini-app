@@ -122,7 +122,13 @@
       historyTime: "Time",
       historyClear: "Clear history",
       historyClearConfirm: "Delete all practice history?",
-      historyCleared: "History cleared"
+     historyCleared: "History cleared",
+      filterAll: "All",
+      filterToday: "Today",
+      filter7d: "7 days",
+      filter30d: "30 days",
+      deleteSession: "Delete this session?",
+      sessionDeleted: "Session deleted"
     },
     bn: {
       words: "শব্দ", trash: "ট্র্যাশ", tools: "টুলস", practice: "প্র্যাকটিস",
@@ -234,7 +240,13 @@
       historyTime: "সময়",
       historyClear: "হিস্ট্রি মুছুন",
       historyClearConfirm: "সব প্র্যাকটিস হিস্ট্রি মুছবেন?",
-      historyCleared: "হিস্ট্রি মুছে ফেলা হয়েছে"
+    historyCleared: "হিস্ট্রি মুছে ফেলা হয়েছে",
+      filterAll: "সব",
+      filterToday: "আজ",
+      filter7d: "৭ দিন",
+      filter30d: "৩০ দিন",
+      deleteSession: "এই সেশনটি মুছবেন?",
+      sessionDeleted: "সেশন মুছে ফেলা হয়েছে"
     }
   };
 
@@ -403,7 +415,7 @@
     dbPutWord: dbPutWord,
     dbPutSession: dbPutSession,
     dbGetAllSessions: dbGetAllSessions,
-    dbClearSessions: dbClearSessions,
+    dbClearSessions: dbClearSessions,dbDeleteSession: dbDeleteSession,
     metaGet: metaGet,
     metaSet: metaSet,
     daysSince: daysSince,
