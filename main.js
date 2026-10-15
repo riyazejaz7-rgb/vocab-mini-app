@@ -1,7 +1,7 @@
 /* ============================================================
    Vocabulary Mini App — main.js
    Local-first word manager with IndexedDB
-   Phase 2: CRUD, search, trash, import/export, i18n
+   Phase 3a: Recent/New/Wrong filters + Practice tab handle
    ============================================================ */
 
 (function () {
@@ -18,33 +18,30 @@
     } catch (e) {}
   }
 
-  /* ---------- Config ---------- */
   var CFG = window.APP_CONFIG || {};
   var TZ = CFG.TIME_ZONE || "Asia/Dhaka";
 
   /* ---------- Translations ---------- */
   var L = {
     en: {
-      words: "Words", trash: "Trash", tools: "Tools", add: "Add word",
-      edit: "Edit word", search: "Search words…", all: "All",
+      words: "Words", trash: "Trash", tools: "Tools", practice: "Practice",
+      add: "Add word", edit: "Edit word",
+      search: "Search words…", all: "All",
+      recent: "Recent", new_words: "New", wrong_words: "Wrong",
       noWords: "No words yet", noWordsSub: "Tap + to add your first word.",
       noMatch: "No matches found",
       emptyTrash: "Trash is empty", emptyTrashSub: "Deleted words appear here.",
       trashHint: "Items stay here until you empty the trash.",
-      // form fields
       en_word: "English word", bn_meaning: "Bengali meaning(s)",
       bn_hint: "Separate multiple meanings with commas",
       synonyms: "Synonyms", antonyms: "Antonyms",
       pos: "Part of speech", example: "Example sentence", notes: "Notes",
       optional: "optional",
       save: "Save", cancel: "Cancel", saveChanges: "Save changes",
-      // actions
       del: "Delete", delForever: "Delete forever", restore: "Restore",
-      // confirmations
       confirmDel: "Move this word to Trash?",
       confirmDelForever: "Delete this word forever? This cannot be undone.",
       confirmEmptyTrash: "Delete everything in Trash forever?",
-      // messages
       saved: "Saved", restored: "Restored", deleted: "Moved to trash",
       permDeleted: "Deleted permanently", trashEmptied: "Trash emptied",
       needEn: "Enter the English word",
@@ -52,9 +49,7 @@
       dupTitle: "Already exists",
       dup: "This word is already saved as #{no}.",
       dupTrash: "This word is in Trash (#{no}). Restore it from there.",
-      // stats
       total: "Total", today: "Today",
-      // tools
       exportTitle: "Backup & export",
       exportDesc: "Save a copy of your words. Keep it safe.",
       backupJson: "Backup (JSON)", exportCsv: "Export (CSV)",
@@ -67,24 +62,44 @@
       importResult: "Added: {a}. Skipped: {s}.",
       restoreResult: "Added: {a}. Updated: {u}. Skipped: {s}.",
       badInput: "Could not read that input",
-      // backup banner
       backupNever: "You haven't backed up yet",
       backupNeverSub: "Export now to protect your words.",
       backupOld: "Last backup: {n} days ago",
       backupToday: "Last backup: today",
       backupNow: "Backup now",
-      // confirmations
       confirmReplace1: "Replace ALL words with this backup? Your current words will be removed.",
       confirmReplace2: "Are you sure? This cannot be undone.",
-      // pos options
       pos_none: "(none)", pos_noun: "noun", pos_verb: "verb",
       pos_adjective: "adjective", pos_adverb: "adverb",
       pos_preposition: "preposition", pos_conjunction: "conjunction",
-      pos_pronoun: "pronoun", pos_interjection: "interjection", pos_other: "other"
+      pos_pronoun: "pronoun", pos_interjection: "interjection", pos_other: "other",
+      practiceComingSoon: "Practice coming soon",
+      practiceComingSoonSub: "Refresh the app to load practice mode.",
+      practiceNoWords: "Add at least 4 words to start practicing.",
+      practiceNoWordsSub: "Tap + on the Words tab.",
+      practiceSetup: "Practice setup",
+      mode: "Mode", mode_bn_en: "বাংলা → English", mode_en_bn: "English → বাংলা", mode_fill: "Fill blanks",
+      questionCount: "Number of questions",
+      wordSource: "Which words",
+      source_all: "All words", source_new: "New words", source_wrong: "Wrong words",
+      startPractice: "Start practice",
+      check: "Check", next: "Next", finish: "Finish",
+      correctLabel: "Correct!", wrongLabel: "Not quite",
+      correctAnswerWas: "Correct answer:",
+      yourAnswer: "Your answer",
+      typeYourAnswer: "Type your answer…",
+      questionOf: "Question {n} of {total}",
+      resultGreat: "Excellent!", resultGood: "Good job!", resultOk: "Keep practicing",
+      youGot: "You got {c} out of {t} correct",
+      accuracy: "Accuracy",
+      tryAgain: "Try again", done: "Done",
+      notEnoughWords: "Need at least 4 words to practice"
     },
     bn: {
-      words: "শব্দ", trash: "ট্র্যাশ", tools: "টুলস", add: "শব্দ যোগ",
-      edit: "শব্দ সম্পাদনা", search: "শব্দ খুঁজুন…", all: "সব",
+      words: "শব্দ", trash: "ট্র্যাশ", tools: "টুলস", practice: "প্র্যাকটিস",
+      add: "শব্দ যোগ", edit: "শব্দ সম্পাদনা",
+      search: "শব্দ খুঁজুন…", all: "সব",
+      recent: "সাম্প্রতিক", new_words: "নতুন", wrong_words: "ভুল",
       noWords: "এখনো কোনো শব্দ নেই", noWordsSub: "+ চাপুন প্রথম শব্দ যোগ করতে।",
       noMatch: "কোনো মিল পাওয়া যায়নি",
       emptyTrash: "ট্র্যাশ খালি", emptyTrashSub: "মুছে ফেলা শব্দ এখানে আসবে।",
@@ -129,7 +144,28 @@
       pos_none: "(নেই)", pos_noun: "বিশেষ্য", pos_verb: "ক্রিয়া",
       pos_adjective: "বিশেষণ", pos_adverb: "ক্রিয়া-বিশেষণ",
       pos_preposition: "পূর্বসর্গ", pos_conjunction: "সংযোজক",
-      pos_pronoun: "সর্বনাম", pos_interjection: "আবেগসূচক", pos_other: "অন্যান্য"
+      pos_pronoun: "সর্বনাম", pos_interjection: "আবেগসূচক", pos_other: "অন্যান্য",
+      practiceComingSoon: "প্র্যাকটিস শীঘ্রই আসছে",
+      practiceComingSoonSub: "অ্যাপ রিফ্রেশ করুন প্র্যাকটিস মোড লোড করতে।",
+      practiceNoWords: "অন্তত ৪টি শব্দ যোগ করুন প্র্যাকটিস শুরু করতে।",
+      practiceNoWordsSub: "শব্দ ট্যাবে + চাপুন।",
+      practiceSetup: "প্র্যাকটিস সেটআপ",
+      mode: "মোড", mode_bn_en: "বাংলা → English", mode_en_bn: "English → বাংলা", mode_fill: "ফাঁকা পূরণ",
+      questionCount: "প্রশ্ন সংখ্যা",
+      wordSource: "কোন শব্দ",
+      source_all: "সব শব্দ", source_new: "নতুন শব্দ", source_wrong: "ভুল শব্দ",
+      startPractice: "প্র্যাকটিস শুরু",
+      check: "যাচাই", next: "পরবর্তী", finish: "শেষ",
+      correctLabel: "সঠিক!", wrongLabel: "সঠিক হয়নি",
+      correctAnswerWas: "সঠিক উত্তর:",
+      yourAnswer: "আপনার উত্তর",
+      typeYourAnswer: "উত্তর লিখুন…",
+      questionOf: "প্রশ্ন {n} / {total}",
+      resultGreat: "অসাধারণ!", resultGood: "ভালো করেছ!", resultOk: "আরো প্র্যাকটিস কর",
+      youGot: "{t}টির মধ্যে {c}টি সঠিক",
+      accuracy: "নির্ভুলতা",
+      tryAgain: "আবার চেষ্টা", done: "সম্পন্ন",
+      notEnoughWords: "প্র্যাকটিসের জন্য অন্তত ৪টি শব্দ দরকার"
     }
   };
 
@@ -143,6 +179,7 @@
   var editingId = null;
   var query = "";
   var filterPos = "";
+  var filterSource = localStorage.getItem("vocab_filter_source") || "";
   var lastBackup = 0;
   var exportBuf = { text: "", kind: "" };
 
@@ -259,7 +296,6 @@
     var cur = (await metaGet("nextNo")) || 1;
     if (cur <= max) await metaSet("nextNo", max + 1);
   }
-
   function findDuplicate(en, exceptId) {
     var n = norm(en);
     for (var i = 0; i < words.length; i++) {
@@ -272,7 +308,34 @@
     for (var i = 0; i < words.length; i++) if (words[i].id === id) return words[i];
     return null;
   }
- 
+
+  /* ---------- Expose for practice.js ---------- */
+  window.VocabMain = {
+    get words() { return words; },
+    get lang() { return lang; },
+    t: t,
+    esc: esc,
+    uid: uid,
+    toast: toast,
+    confirmDialog: confirmDialog,
+    dbPutWord: dbPutWord,
+    metaGet: metaGet,
+    metaSet: metaSet,
+    setTitle: function (s) { var el = $("title"); if (el) el.textContent = s; },
+    setActiveNav: function (k) {
+      document.querySelectorAll(".navbtn").forEach(function (b) {
+        b.classList.toggle("active", b.dataset.nav === k);
+      });
+    },
+    showFab: function (show) {
+      var f = $("fab"); if (f) f.classList.toggle("hidden", !show);
+    },
+    showBack: function (show) {
+      var b = $("back"); if (b) b.classList.toggle("hidden", !show);
+    },
+    getAppEl: function () { return $("app"); },
+    getFilterSource: function () { return filterSource; }
+  };
 /* ---------- Rendering — Words list ---------- */
 function activeWords() {
   return words.filter(function (w) { return !w.deleted; });
@@ -283,6 +346,15 @@ function trashWords() {
 }
 function matches(w) {
   if (filterPos && w.pos !== filterPos) return false;
+  if (filterSource === "recent") {
+    if (!w.created) return false;
+    var daysOld = (Date.now() - w.created) / 86400000;
+    if (daysOld > 7) return false;
+  } else if (filterSource === "new") {
+    if (w.practiced) return false;
+  } else if (filterSource === "wrong") {
+    if (!w.wrongCount || w.wrongCount < 1) return false;
+  }
   if (!query) return true;
   var q = query.toLowerCase();
   return (w.en && w.en.toLowerCase().indexOf(q) > -1) ||
@@ -301,16 +373,19 @@ function renderWords() {
   var today = activeWords().filter(function (w) {
     return w.created && daysSince(w.created) < 1;
   }).length;
+  var recentCount = activeWords().filter(function (w) {
+    return w.created && (Date.now() - w.created) / 86400000 <= 7;
+  }).length;
+  var newCount = activeWords().filter(function (w) { return !w.practiced; }).length;
+  var wrongCount = activeWords().filter(function (w) { return w.wrongCount && w.wrongCount > 0; }).length;
 
   var html = "";
 
-  // stats
   html += '<div class="stats">';
   html += '<div class="stat"><span class="n">' + total + '</span><span class="l">' + t("total") + '</span></div>';
   html += '<div class="stat"><span class="n">' + today + '</span><span class="l">' + t("today") + '</span></div>';
   html += '</div>';
 
-  // backup banner
   if (total > 0) {
     var b = lastBackup;
     if (!b) {
@@ -320,13 +395,23 @@ function renderWords() {
     }
   }
 
-  // search bar
   html += '<div class="searchbar"><input id="search" type="search" placeholder="' + esc(t("search")) + '" value="' + esc(query) + '" autocomplete="off"></div>';
 
-  // filter chips
   if (total > 0) {
     html += '<div class="chips">';
-    html += '<button data-filter="" class="' + (filterPos === "" ? "on" : "") + '">' + t("all") + '</button>';
+    html += '<button data-source="" class="' + (filterSource === "" ? "on" : "") + '">' + t("all") + '</button>';
+    if (recentCount > 0) {
+      html += '<button data-source="recent" class="' + (filterSource === "recent" ? "on" : "") + '">' + t("recent") + ' (' + recentCount + ')</button>';
+    }
+    if (newCount > 0) {
+      html += '<button data-source="new" class="' + (filterSource === "new" ? "on" : "") + '">' + t("new_words") + ' (' + newCount + ')</button>';
+    }
+    if (wrongCount > 0) {
+      html += '<button data-source="wrong" class="' + (filterSource === "wrong" ? "on" : "") + '">' + t("wrong_words") + ' (' + wrongCount + ')</button>';
+    }
+    if (filterPos || recentCount > 0 || newCount > 0 || wrongCount > 0) {
+      html += '<span style="width:1px;background:var(--border);margin:6px 2px;flex-shrink:0"></span>';
+    }
     POS.slice(1).forEach(function (p) {
       var count = activeWords().filter(function (w) { return w.pos === p; }).length;
       if (count === 0) return;
@@ -335,7 +420,6 @@ function renderWords() {
     html += '</div>';
   }
 
-  // list
   if (!total) {
     html += emptyState("noWords", "noWordsSub");
   } else if (!list.length) {
@@ -348,6 +432,7 @@ function renderWords() {
   setTitle(t("words"));
   setActiveNav("words");
   showFab(true);
+  showBack(false);
 }
 
 function renderWordCard(w) {
@@ -481,7 +566,6 @@ function renderTrash() {
 function renderTools() {
   var h = '<section class="view">';
 
-  // Export section
   h += '<div class="section">';
   h += '<h2>' + t("exportTitle") + '</h2>';
   h += '<p class="desc">' + t("exportDesc") + '</p>';
@@ -498,7 +582,6 @@ function renderTools() {
   }
   h += '</div>';
 
-  // Import section
   h += '<div class="section">';
   h += '<h2>' + t("importTitle") + '</h2>';
   h += '<p class="desc">' + t("importDesc") + '</p>';
@@ -533,24 +616,24 @@ function renderTools() {
     });
   }
 }
-  /* ---------- UI helpers ---------- */
-  function setTitle(s) { var el = $("title"); if (el) el.textContent = s; }
-  function setActiveNav(k) {
-    document.querySelectorAll(".navbtn").forEach(function (b) {
-      b.classList.toggle("active", b.dataset.nav === k);
-    });
-  }
-  function showFab(show) {
-    var f = $("fab"); if (f) f.classList.toggle("hidden", !show);
-  }
-  function showBack(show) {
-    var b = $("back"); if (b) b.classList.toggle("hidden", !show);
-  }
-  function updateLangChip() {
-    var c = $("lang-toggle");
-    if (c) c.textContent = lang === "bn" ? "EN" : "বাং";
-  }
 
+/* ---------- UI helpers ---------- */
+function setTitle(s) { var el = $("title"); if (el) el.textContent = s; }
+function setActiveNav(k) {
+  document.querySelectorAll(".navbtn").forEach(function (b) {
+    b.classList.toggle("active", b.dataset.nav === k);
+  });
+}
+function showFab(show) {
+  var f = $("fab"); if (f) f.classList.toggle("hidden", !show);
+}
+function showBack(show) {
+  var b = $("back"); if (b) b.classList.toggle("hidden", !show);
+}
+function updateLangChip() {
+  var c = $("lang-toggle");
+  if (c) c.textContent = lang === "bn" ? "EN" : "বাং";
+}
   /* ---------- Actions ---------- */
   async function saveWord() {
     var en = ($("f_en").value || "").trim();
@@ -581,7 +664,8 @@ function renderTools() {
         no: await getNextNo(),
         en: en, bn: bn, pos: pos, syn: syn, ant: ant,
         ex: ex, note: note,
-        created: Date.now(), updated: Date.now(), deleted: null
+        created: Date.now(), updated: Date.now(), deleted: null,
+        practiced: false, correctCount: 0, wrongCount: 0
       };
       words.push(w);
     }
@@ -736,7 +820,8 @@ function renderTools() {
         no: await getNextNo(),
         en: en, bn: bn,
         syn: [], ant: [], pos: "", ex: "", note: "",
-        created: Date.now(), updated: Date.now(), deleted: null
+        created: Date.now(), updated: Date.now(), deleted: null,
+        practiced: false, correctCount: 0, wrongCount: 0
       };
       words.push(w);
       await dbPutWord(w);
@@ -771,7 +856,8 @@ function renderTools() {
     }).map(function (w) {
       return Object.assign({
         syn: [], ant: [], pos: "", ex: "", note: "",
-        created: Date.now(), updated: 0, deleted: null
+        created: Date.now(), updated: 0, deleted: null,
+        practiced: false, correctCount: 0, wrongCount: 0
       }, w);
     });
 
@@ -821,6 +907,17 @@ function renderTools() {
     editingId = null;
     query = "";
     if (v === "words") renderWords();
+    else if (v === "practice") {
+      if (window.Practice && window.Practice.open) {
+        window.Practice.open();
+      } else {
+        $("app").innerHTML = '<section class="view"><div class="empty"><p class="title">' + t("practiceComingSoon") + '</p><p>' + t("practiceComingSoonSub") + '</p></div></section>';
+        setTitle(t("practice"));
+        setActiveNav("practice");
+        showFab(false);
+        showBack(false);
+      }
+    }
     else if (v === "trash") renderTrash();
     else if (v === "tools") renderTools();
     else if (v === "add") renderForm();
@@ -828,6 +925,7 @@ function renderTools() {
 
   function render() {
     if (view === "words") renderWords();
+    else if (view === "practice") go("practice");
     else if (view === "trash") renderTrash();
     else if (view === "tools") renderTools();
     else if (view === "add") renderForm();
@@ -841,6 +939,14 @@ function renderTools() {
     var filt = e.target.closest("[data-filter]");
     if (filt) {
       filterPos = filt.dataset.filter;
+      renderWords();
+      return;
+    }
+
+    var src = e.target.closest("[data-source]");
+    if (src) {
+      filterSource = src.dataset.source;
+      try { localStorage.setItem("vocab_filter_source", filterSource); } catch (x) {}
       renderWords();
       return;
     }
@@ -875,7 +981,6 @@ function renderTools() {
       var cardsHtml = list.length
         ? list.map(renderWordCard).join("")
         : emptyState("noMatch", "");
-      // remove old cards (keep stats/banner/search/chips)
       var oldCards = container.querySelectorAll(".card, .empty");
       oldCards.forEach(function (el) { el.remove(); });
       container.insertAdjacentHTML("beforeend", cardsHtml);
@@ -886,7 +991,6 @@ function renderTools() {
     }
   });
 
-  // FAB and back button
   document.addEventListener("click", function (e) {
     if (e.target.closest("#fab")) { editingId = null; view = "add"; renderForm(); }
     if (e.target.closest("#back")) { go("words"); }
