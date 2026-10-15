@@ -42,8 +42,7 @@
       dup: "This word is already saved as #{no}.",
       dupTrash: "This word is in Trash (#{no}). Restore it from there.",
       total: "Total", today: "Today",
-      exportTitle: "Backup & export",
-      exportDesc: "Save a copy of your words. Keep it safe.",
+      exportTitle: "Backup & export", exportDesc: "Save a copy of your words. Keep it safe.",
       backupJson: "Backup (JSON)", exportCsv: "Export (CSV)",
       copy: "Copy", download: "Download", copied: "Copied",
       importTitle: "Import & restore",
@@ -56,8 +55,7 @@
       badInput: "Could not read that input",
       backupNever: "You haven't backed up yet",
       backupNeverSub: "Export now to protect your words.",
-      backupOld: "Last backup: {n} days ago",
-      backupToday: "Last backup: today",
+      backupOld: "Last backup: {n} days ago", backupToday: "Last backup: today",
       backupNow: "Backup now",
       confirmReplace1: "Replace ALL words with this backup?",
       confirmReplace2: "Are you sure? This cannot be undone.",
@@ -66,24 +64,19 @@
       pos_preposition: "preposition", pos_conjunction: "conjunction",
       pos_pronoun: "pronoun", pos_interjection: "interjection", pos_other: "other",
       practice: "Practice", practiceSetup: "Practice setup",
-      mode: "Mode",
-      mode_bn_en: "বাংলা → English", mode_en_bn: "English → বাংলা", mode_fill: "Fill blanks",
-      questionCount: "Number of questions",
-      wordSource: "Which words",
+      mode: "Mode", mode_bn_en: "বাংলা → English", mode_en_bn: "English → বাংলা", mode_fill: "Fill blanks",
+      questionCount: "Number of questions", wordSource: "Which words",
       source_all: "All words", source_new: "New words", source_wrong: "Wrong words",
       source_range: "Range", source_due: "Due today",
-      rangeLabel: "Pick a range", rangeFrom: "From", rangeTo: "To",
-      rangeWordsFound: "words found",
+      rangeLabel: "Pick a range", rangeFrom: "From", rangeTo: "To", rangeWordsFound: "words found",
       startPractice: "Start practice",
       check: "Check", next: "Next", finish: "Finish",
       correctLabel: "Correct!", wrongLabel: "Wrong",
-      correctAnswerWas: "Correct answer:",
-      typeYourAnswer: "Type your answer…",
+      correctAnswerWas: "Correct answer:", typeYourAnswer: "Type your answer…",
       questionOf: "Question {n} of {total}",
       resultGreat: "Excellent!", resultGood: "Good job!", resultOk: "Keep practicing",
       youGot: "You got {c} out of {t} correct",
-      accuracy: "Accuracy",
-      tryAgain: "Try again", done: "Done",
+      accuracy: "Accuracy", tryAgain: "Try again", done: "Done",
       notEnoughWords: "Need at least 4 words to practice",
       practiceNoWords: "Add at least 4 words to start practicing.",
       practiceNoWordsSub: "Tap + on the Words tab.",
@@ -95,42 +88,34 @@
       viewDetails: "View details", hideDetails: "Hide details",
       practiceWrong: "Practice wrong",
       youWrote: "You wrote:", correctAnswer: "Correct answer:",
-      historyTitle: "Practice history",
-      historyDesc: "Your past practice sessions.",
-      historyEmpty: "No sessions yet",
-      historyEmptySub: "Complete a practice session to see it here.",
+      historyTitle: "Practice history", historyDesc: "Your past practice sessions.",
+      historyEmpty: "No sessions yet", historyEmptySub: "Complete a practice session to see it here.",
       historyToday: "Today", historyYesterday: "Yesterday",
-      historySession: "Session", historyMode: "Mode",
-      historyScore: "Score", historyTime: "Time",
-      historyClear: "Clear history",
-      historyClearConfirm: "Delete all practice history?",
+      historySession: "Session", historyMode: "Mode", historyScore: "Score", historyTime: "Time",
+      historyClear: "Clear history", historyClearConfirm: "Delete all practice history?",
       historyCleared: "History cleared",
       filterAll: "All", filterToday: "Today", filter7d: "7 days", filter30d: "30 days",
-      deleteSession: "Delete this session?",
-      sessionDeleted: "Session deleted",
-      statsTitle: "Stats",
-      statsTodayPracticed: "Today",
-      statsWeekPracticed: "7 days",
-      statsTotalWords: "Words",
-      statsMastered: "Mastered",
-      statsStreak: "Streak",
-      statsDays: "days",
-      statsDueToday: "Due today",
-      statsDueTodayDesc: "Review these words today",
-      statsDueNothing: "Nothing due today — great work!",
-      statsStartReview: "Start review",
-      statsWeeklyChart: "Last 7 days",
-      statsMasteredList: "Mastered words",
+      deleteSession: "Delete this session?", sessionDeleted: "Session deleted",
+      statsTitle: "Stats", statsTodayPracticed: "Today", statsWeekPracticed: "7 days",
+      statsTotalWords: "Words", statsMastered: "Mastered", statsStreak: "Streak", statsDays: "days",
+      statsDueToday: "Due today", statsDueTodayDesc: "Review these words today",
+      statsDueNothing: "Nothing due today — great work!", statsStartReview: "Start review",
+      statsWeeklyChart: "Last 7 days", statsMasteredList: "Mastered words",
       statsMasteredEmpty: "No mastered words yet. Keep practicing!",
-      statsReviewSchedule: "Review schedule",
-      statsBox: "Box {n}",
-      statsNextReview: "Next: {d} days",
-      statsReviewNow: "Review now",
-      statsLevel1: "Learning",
-      statsLevel2: "Almost",
-      statsLevel3: "Good",
-      statsLevel4: "Strong",
-      statsLevel5: "Mastered"
+      statsReviewSchedule: "Review schedule", statsBox: "Box {n}",
+      statsNextReview: "Next: {d} days", statsReviewNow: "Review now",
+      statsLevel1: "Learning", statsLevel2: "Almost", statsLevel3: "Good",
+      statsLevel4: "Strong", statsLevel5: "Mastered",
+      syncTitle: "Cloud sync", syncDesc: "Sync your words to the cloud.",
+      syncLogin: "Log in with Telegram", syncLogout: "Log out", syncNow: "Sync now",
+      syncStatusIdle: "Not logged in", syncStatusSyncing: "Syncing…",
+      syncStatusOk: "Synced", syncStatusError: "Sync error", syncStatusOffline: "Offline",
+      syncLastAt: "Last sync: {t}", syncNever: "Never synced",
+      syncLoginSuccess: "Logged in", syncLoginFail: "Login failed",
+      syncSuccess: "Synced: +{p} words, ↓{g} words",
+      syncNothing: "Already up to date",
+      syncLogoutConfirm: "Log out from cloud sync?",
+      syncLoggedOut: "Logged out"
     },
     bn: {
       words: "শব্দ", trash: "ট্র্যাশ", tools: "টুলস", practice: "প্র্যাকটিস", stats: "স্ট্যাটস",
@@ -153,13 +138,11 @@
       confirmEmptyTrash: "ট্র্যাশের সব শব্দ চিরতরে মুছবেন?",
       saved: "সংরক্ষিত", restored: "ফিরিয়ে আনা হয়েছে", deleted: "ট্র্যাশে পাঠানো হয়েছে",
       permDeleted: "চিরতরে মুছে ফেলা হয়েছে", trashEmptied: "ট্র্যাশ খালি করা হয়েছে",
-      needEn: "ইংরেজি শব্দ লিখুন",
-      needBn: "অন্তত একটি বাংলা অর্থ লিখুন",
+      needEn: "ইংরেজি শব্দ লিখুন", needBn: "অন্তত একটি বাংলা অর্থ লিখুন",
       dup: "এই শব্দ আগেই সংরক্ষিত আছে #{no} হিসেবে।",
       dupTrash: "এই শব্দ ট্র্যাশে আছে (#{no})। সেখান থেকে ফিরিয়ে আনুন।",
       total: "মোট", today: "আজ",
-      exportTitle: "ব্যাকআপ ও এক্সপোর্ট",
-      exportDesc: "আপনার শব্দের একটি কপি সংরক্ষণ করুন।",
+      exportTitle: "ব্যাকআপ ও এক্সপোর্ট", exportDesc: "আপনার শব্দের একটি কপি সংরক্ষণ করুন।",
       backupJson: "ব্যাকআপ (JSON)", exportCsv: "এক্সপোর্ট (CSV)",
       copy: "কপি", download: "ডাউনলোড", copied: "কপি হয়েছে",
       importTitle: "ইমপোর্ট ও রিস্টোর",
@@ -172,8 +155,7 @@
       badInput: "ইনপুট পড়া যায়নি",
       backupNever: "এখনো ব্যাকআপ নেননি",
       backupNeverSub: "শব্দ রক্ষা করতে এখনই এক্সপোর্ট করুন।",
-      backupOld: "শেষ ব্যাকআপ: {n} দিন আগে",
-      backupToday: "শেষ ব্যাকআপ: আজ",
+      backupOld: "শেষ ব্যাকআপ: {n} দিন আগে", backupToday: "শেষ ব্যাকআপ: আজ",
       backupNow: "ব্যাকআপ নিন",
       confirmReplace1: "সব শব্দ এই ব্যাকআপ দিয়ে বদলাবেন?",
       confirmReplace2: "নিশ্চিত? এটি ফেরানো যাবে না।",
@@ -182,24 +164,19 @@
       pos_preposition: "পূর্বসর্গ", pos_conjunction: "সংযোজক",
       pos_pronoun: "সর্বনাম", pos_interjection: "আবেগসূচক", pos_other: "অন্যান্য",
       practice: "প্র্যাকটিস", practiceSetup: "প্র্যাকটিস সেটআপ",
-      mode: "মোড",
-      mode_bn_en: "বাংলা → English", mode_en_bn: "English → বাংলা", mode_fill: "ফাঁকা পূরণ",
-      questionCount: "প্রশ্ন সংখ্যা",
-      wordSource: "কোন শব্দ",
+      mode: "মোড", mode_bn_en: "বাংলা → English", mode_en_bn: "English → বাংলা", mode_fill: "ফাঁকা পূরণ",
+      questionCount: "প্রশ্ন সংখ্যা", wordSource: "কোন শব্দ",
       source_all: "সব শব্দ", source_new: "নতুন শব্দ", source_wrong: "ভুল শব্দ",
       source_range: "রেঞ্জ", source_due: "আজকের রিভিউ",
-      rangeLabel: "রেঞ্জ বেছে নিন", rangeFrom: "থেকে", rangeTo: "পর্যন্ত",
-      rangeWordsFound: "শব্দ পাওয়া গেছে",
+      rangeLabel: "রেঞ্জ বেছে নিন", rangeFrom: "থেকে", rangeTo: "পর্যন্ত", rangeWordsFound: "শব্দ পাওয়া গেছে",
       startPractice: "প্র্যাকটিস শুরু",
       check: "যাচাই", next: "পরবর্তী", finish: "শেষ",
       correctLabel: "সঠিক!", wrongLabel: "সঠিক হয়নি",
-      correctAnswerWas: "সঠিক উত্তর:",
-      typeYourAnswer: "উত্তর লিখুন…",
+      correctAnswerWas: "সঠিক উত্তর:", typeYourAnswer: "উত্তর লিখুন…",
       questionOf: "প্রশ্ন {n} / {total}",
       resultGreat: "অসাধারণ!", resultGood: "ভালো করেছ!", resultOk: "আরো প্র্যাকটিস কর",
       youGot: "{t}টির মধ্যে {c}টি সঠিক",
-      accuracy: "নির্ভুলতা",
-      tryAgain: "আবার চেষ্টা", done: "সম্পন্ন",
+      accuracy: "নির্ভুলতা", tryAgain: "আবার চেষ্টা", done: "সম্পন্ন",
       notEnoughWords: "প্র্যাকটিসের জন্য অন্তত ৪টি শব্দ দরকার",
       practiceNoWords: "অন্তত ৪টি শব্দ যোগ করুন প্র্যাকটিস শুরু করতে।",
       practiceNoWordsSub: "শব্দ ট্যাবে + চাপুন।",
@@ -211,42 +188,34 @@
       viewDetails: "বিস্তারিত দেখুন", hideDetails: "বিস্তারিত লুকান",
       practiceWrong: "ভুলগুলো প্র্যাকটিস",
       youWrote: "আপনি লিখেছেন:", correctAnswer: "সঠিক উত্তর:",
-      historyTitle: "প্র্যাকটিস হিস্ট্রি",
-      historyDesc: "আপনার আগের প্র্যাকটিস সেশন।",
-      historyEmpty: "এখনো কোনো সেশন নেই",
-      historyEmptySub: "একটি প্র্যাকটিস সেশন সম্পন্ন করলে এখানে দেখা যাবে।",
+      historyTitle: "প্র্যাকটিস হিস্ট্রি", historyDesc: "আপনার আগের প্র্যাকটিস সেশন।",
+      historyEmpty: "এখনো কোনো সেশন নেই", historyEmptySub: "একটি প্র্যাকটিস সেশন সম্পন্ন করলে এখানে দেখা যাবে।",
       historyToday: "আজ", historyYesterday: "গতকাল",
-      historySession: "সেশন", historyMode: "মোড",
-      historyScore: "স্কোর", historyTime: "সময়",
-      historyClear: "হিস্ট্রি মুছুন",
-      historyClearConfirm: "সব প্র্যাকটিস হিস্ট্রি মুছবেন?",
+      historySession: "সেশন", historyMode: "মোড", historyScore: "স্কোর", historyTime: "সময়",
+      historyClear: "হিস্ট্রি মুছুন", historyClearConfirm: "সব প্র্যাকটিস হিস্ট্রি মুছবেন?",
       historyCleared: "হিস্ট্রি মুছে ফেলা হয়েছে",
       filterAll: "সব", filterToday: "আজ", filter7d: "৭ দিন", filter30d: "৩০ দিন",
-      deleteSession: "এই সেশনটি মুছবেন?",
-      sessionDeleted: "সেশন মুছে ফেলা হয়েছে",
-      statsTitle: "স্ট্যাটস",
-      statsTodayPracticed: "আজ",
-      statsWeekPracticed: "৭ দিন",
-      statsTotalWords: "শব্দ",
-      statsMastered: "মাস্টারড",
-      statsStreak: "স্ট্রিক",
-      statsDays: "দিন",
-      statsDueToday: "আজকের রিভিউ",
-      statsDueTodayDesc: "আজ এই শব্দগুলো রিভিউ করুন",
-      statsDueNothing: "আজ কোনো রিভিউ নেই — দারুণ!",
-      statsStartReview: "রিভিউ শুরু",
-      statsWeeklyChart: "শেষ ৭ দিন",
-      statsMasteredList: "মাস্টারড শব্দ",
+      deleteSession: "এই সেশনটি মুছবেন?", sessionDeleted: "সেশন মুছে ফেলা হয়েছে",
+      statsTitle: "স্ট্যাটস", statsTodayPracticed: "আজ", statsWeekPracticed: "৭ দিন",
+      statsTotalWords: "শব্দ", statsMastered: "মাস্টারড", statsStreak: "স্ট্রিক", statsDays: "দিন",
+      statsDueToday: "আজকের রিভিউ", statsDueTodayDesc: "আজ এই শব্দগুলো রিভিউ করুন",
+      statsDueNothing: "আজ কোনো রিভিউ নেই — দারুণ!", statsStartReview: "রিভিউ শুরু",
+      statsWeeklyChart: "শেষ ৭ দিন", statsMasteredList: "মাস্টারড শব্দ",
       statsMasteredEmpty: "এখনো কোনো মাস্টারড শব্দ নেই। চালিয়ে যান!",
-      statsReviewSchedule: "রিভিউ শিডিউল",
-      statsBox: "বক্স {n}",
-      statsNextReview: "পরবর্তী: {d} দিন",
-      statsReviewNow: "এখনই রিভিউ",
-      statsLevel1: "শিখছি",
-      statsLevel2: "প্রায়",
-      statsLevel3: "ভালো",
-      statsLevel4: "শক্ত",
-      statsLevel5: "মাস্টারড"
+      statsReviewSchedule: "রিভিউ শিডিউল", statsBox: "বক্স {n}",
+      statsNextReview: "পরবর্তী: {d} দিন", statsReviewNow: "এখনই রিভিউ",
+      statsLevel1: "শিখছি", statsLevel2: "প্রায়", statsLevel3: "ভালো",
+      statsLevel4: "শক্ত", statsLevel5: "মাস্টারড",
+      syncTitle: "ক্লাউড সিঙ্ক", syncDesc: "আপনার শব্দ ক্লাউডে সিঙ্ক করুন।",
+      syncLogin: "Telegram দিয়ে লগইন", syncLogout: "লগআউট", syncNow: "এখনই সিঙ্ক",
+      syncStatusIdle: "লগইন নেই", syncStatusSyncing: "সিঙ্ক চলছে…",
+      syncStatusOk: "সিঙ্ক হয়েছে", syncStatusError: "সিঙ্ক সমস্যা", syncStatusOffline: "অফলাইন",
+      syncLastAt: "শেষ সিঙ্ক: {t}", syncNever: "এখনো সিঙ্ক হয়নি",
+      syncLoginSuccess: "লগইন হয়েছে", syncLoginFail: "লগইন হয়নি",
+      syncSuccess: "সিঙ্ক: +{p} শব্দ, ↓{g} শব্দ",
+      syncNothing: "আগে থেকেই আপ-টু-ডেট",
+      syncLogoutConfirm: "ক্লাউড সিঙ্ক থেকে লগআউট?",
+      syncLoggedOut: "লগআউট হয়েছে"
     }
   };
 
@@ -264,6 +233,7 @@
   var filterSource = localStorage.getItem("vocab_filter_source") || "";
   var lastBackup = 0;
   var exportBuf = { text: "", kind: "" };
+  var syncUnsub = null;
 
   function t(key, args) {
     var s = (L[lang] && L[lang][key]) || L.en[key] || key;
@@ -276,19 +246,13 @@
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
   }
-  function norm(s) {
-    return String(s || "").trim().toLowerCase().replace(/\s+/g, " ");
-  }
-  function splitList(s) {
-    return String(s || "").split(/[,;،]+/).map(function (x) { return x.trim(); }).filter(Boolean);
-  }
+  function norm(s) { return String(s || "").trim().toLowerCase().replace(/\s+/g, " "); }
+  function splitList(s) { return String(s || "").split(/[,;،]+/).map(function (x) { return x.trim(); }).filter(Boolean); }
   function uid() {
     return (window.crypto && crypto.randomUUID) ? crypto.randomUUID() :
       "id-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 10);
   }
-  function daysSince(ts) {
-    return Math.floor((Date.now() - ts) / 86400000);
-  }
+  function daysSince(ts) { return Math.floor((Date.now() - ts) / 86400000); }
   function todayKey() {
     var d = new Date();
     return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
@@ -324,7 +288,7 @@
   function openDB() {
     return new Promise(function (resolve, reject) {
       var req = indexedDB.open("vocab_db", 3);
-      req.onupgradeneeded = function (ev) {
+      req.onupgradeneeded = function () {
         var d = req.result;
         if (!d.objectStoreNames.contains("words")) d.createObjectStore("words", { keyPath: "id" });
         if (!d.objectStoreNames.contains("meta")) d.createObjectStore("meta", { keyPath: "k" });
@@ -348,12 +312,12 @@
   function dbGetAllSessions() { return txStore("sessions", "readonly", function (s) { return s.getAll(); }); }
   function dbGetAllReviews() { return txStore("reviews", "readonly", function (s) { return s.getAll(); }); }
   function dbPutWord(w) { return txStore("words", "readwrite", function (s) { s.put(w); }); }
+  function dbPutWords(ws) { return txStore("words", "readwrite", function (s) { ws.forEach(function (w) { s.put(w); }); }); }
   function dbPutSession(se) { return txStore("sessions", "readwrite", function (s) { s.put(se); }); }
   function dbDeleteSession(id) { return txStore("sessions", "readwrite", function (s) { s.delete(id); }); }
   function dbClearSessions() { return txStore("sessions", "readwrite", function (s) { s.clear(); }); }
   function dbPutReview(r) { return txStore("reviews", "readwrite", function (s) { s.put(r); }); }
   function dbClearReviews() { return txStore("reviews", "readwrite", function (s) { s.clear(); }); }
-  function dbPutWords(ws) { return txStore("words", "readwrite", function (s) { ws.forEach(function (w) { s.put(w); }); }); }
   function dbDeleteWord(id) { return txStore("words", "readwrite", function (s) { s.delete(id); }); }
   function dbClearWords() { return txStore("words", "readwrite", function (s) { s.clear(); }); }
   function metaGet(k) { return txStore("meta", "readonly", function (s) { return s.get(k); }).then(function (r) { return r ? r.v : undefined; }); }
@@ -380,9 +344,7 @@
     for (var i = 0; i < words.length; i++) if (words[i].id === id) return words[i];
     return null;
   }
-  function getReview(wordId) {
-    return reviews[wordId] || null;
-  }
+  function getReview(wordId) { return reviews[wordId] || null; }
   function isDueToday(wordId) {
     var r = reviews[wordId];
     if (!r) return true;
@@ -390,9 +352,7 @@
     return r.nextReview <= Date.now();
   }
   function getDueWords() {
-    return words.filter(function (w) {
-      return !w.deleted && isDueToday(w.id);
-    });
+    return words.filter(function (w) { return !w.deleted && isDueToday(w.id); });
   }
   function isMastered(wordId) {
     var r = reviews[wordId];
@@ -400,14 +360,7 @@
     return (r.box || 0) >= 5;
   }
   function updateReviewAfterAnswer(wordId, correct) {
-    var r = reviews[wordId] || {
-      wordId: wordId,
-      box: 0,
-      lastReview: 0,
-      nextReview: 0,
-      correctStreak: 0,
-      days: {}
-    };
+    var r = reviews[wordId] || { wordId: wordId, box: 0, lastReview: 0, nextReview: 0, correctStreak: 0, days: {} };
     var tk = todayKey();
     r.days = r.days || {};
     r.days[tk] = (r.days[tk] || 0) + (correct ? 1 : 0);
@@ -418,15 +371,12 @@
       r.box = 1;
       r.correctStreak = 0;
     }
-    var correctDays = 0;
-    var totalCorrect = 0;
+    var correctDays = 0, totalCorrect = 0;
     Object.keys(r.days).forEach(function (d) {
       if (r.days[d] > 0) correctDays++;
       totalCorrect += r.days[d];
     });
-    if (totalCorrect >= MASTERY.MIN_CORRECT && correctDays >= MASTERY.MIN_DAYS) {
-      r.box = 5;
-    }
+    if (totalCorrect >= MASTERY.MIN_CORRECT && correctDays >= MASTERY.MIN_DAYS) r.box = 5;
     r.lastReview = Date.now();
     var interval = LEITNER_DAYS[Math.max(0, Math.min(LEITNER_DAYS.length - 1, (r.box || 1) - 1))] || 1;
     r.nextReview = Date.now() + interval * 86400000;
@@ -434,8 +384,73 @@
     return dbPutReview(r);
   }
 
+  /* ---------- Sync helpers ---------- */
+  async function collectLocalData() {
+    return { words: words, sessions: sessions, reviews: reviews };
+  }
+  async function applyPulledData(data) {
+    if (!data) return;
+    if (Array.isArray(data.words) && data.words.length) {
+      // Merge: newest updated wins
+      var map = {};
+      words.forEach(function (w) { map[w.id] = w; });
+      data.words.forEach(function (cw) {
+        var lw = map[cw.id];
+        if (!lw || (cw.updated || 0) > (lw.updated || 0)) {
+          map[cw.id] = cw;
+        }
+      });
+      words = Object.keys(map).map(function (k) { return map[k]; });
+      await dbPutWords(words);
+    }
+    if (Array.isArray(data.sessions)) {
+      var sMap = {};
+      sessions.forEach(function (s) { sMap[s.id] = s; });
+      data.sessions.forEach(function (cs) {
+        if (!sMap[cs.id]) {
+          sMap[cs.id] = {
+            id: cs.id, date: new Date(cs.date).getTime(), mode: cs.mode,
+            total: cs.total, correct: cs.correct, durationMs: cs.duration_ms,
+            answers: cs.answers || []
+          };
+        }
+      });
+      sessions = Object.keys(sMap).map(function (k) { return sMap[k]; }).sort(function (a, b) { return b.date - a.date; });
+      for (var i = 0; i < data.sessions.length; i++) await dbPutSession(sessions.find(function (s) { return s.id === data.sessions[i].id; }));
+    }
+    if (data.reviews && typeof data.reviews === "object") {
+      Object.keys(data.reviews).forEach(function (k) {
+        var cr = data.reviews[k];
+        var lr = reviews[k];
+        if (!lr || (cr.lastReview || 0) > (lr.lastReview || 0)) {
+          reviews[k] = cr;
+        }
+      });
+      var rKeys = Object.keys(reviews);
+      for (var j = 0; j < rKeys.length; j++) await dbPutReview(reviews[rKeys[j]]);
+    }
+    await fixNextNo();
+  }
+
+  function renderSyncChip() {
+    var el = $("sync-chip");
+    if (!el || !window.VocabSync) return;
+    var st = window.VocabSync.getState();
+    var cls = "sync-chip";
+    var label = "";
+    if (st.status === "ok") { cls += " ok"; label = "☁"; }
+    else if (st.status === "syncing") { cls += " syncing"; label = "↻"; }
+    else if (st.status === "error") { cls += " error"; label = "⚠"; }
+    else if (st.status === "offline") { cls += " offline"; label = "⊘"; }
+    else { cls += " idle"; label = "☁"; }
+    el.className = cls;
+    el.textContent = label;
+    el.title = st.status + (st.errorMsg ? ": " + st.errorMsg : "");
+  }
+
   window.VocabMain = {
     get words() { return words; },
+    set words(v) { words = v; },
     get sessions() { return sessions; },
     get reviews() { return reviews; },
     get lang() { return lang; },
@@ -446,6 +461,9 @@
     metaGet: metaGet, metaSet: metaSet, daysSince: daysSince,
     isDueToday: isDueToday, getDueWords: getDueWords, isMastered: isMastered,
     updateReviewAfterAnswer: updateReviewAfterAnswer,
+    getLocalData: collectLocalData,
+    applyPulledData: applyPulledData,
+    renderSyncChip: renderSyncChip,
     setTitle: function (s) { var el = $("title"); if (el) el.textContent = s; },
     setActiveNav: function (k) {
       document.querySelectorAll(".navbtn").forEach(function (b) {
@@ -458,12 +476,9 @@
     LEITNER_DAYS: LEITNER_DAYS,
     MASTERY: MASTERY
   };
-  function activeWords() {
-    return words.filter(function (w) { return !w.deleted; });
-  }
+  function activeWords() { return words.filter(function (w) { return !w.deleted; }); }
   function trashWords() {
-    return words.filter(function (w) { return w.deleted; })
-      .sort(function (a, b) { return a.deleted - b.deleted; });
+    return words.filter(function (w) { return w.deleted; }).sort(function (a, b) { return a.deleted - b.deleted; });
   }
   function matches(w) {
     if (filterPos && w.pos !== filterPos) return false;
@@ -494,7 +509,6 @@
     var wrongCount = activeWords().filter(function (w) { return w.wrongCount && w.wrongCount > 0; }).length;
 
     var html = "";
-
     html += '<div class="stats">';
     html += '<div class="stat"><span class="n">' + total + '</span><span class="l">' + t("total") + '</span></div>';
     html += '<div class="stat"><span class="n">' + today + '</span><span class="l">' + t("today") + '</span></div>';
@@ -502,11 +516,8 @@
 
     if (total > 0) {
       var b = lastBackup;
-      if (!b) {
-        html += '<div class="banner warn"><span>' + t("backupNever") + ' — ' + t("backupNeverSub") + '</span><button data-act="backup-now">' + t("backupNow") + '</button></div>';
-      } else if (daysSince(b) > 7) {
-        html += '<div class="banner warn"><span>' + t("backupOld", { n: daysSince(b) }) + '</span><button data-act="backup-now">' + t("backupNow") + '</button></div>';
-      }
+      if (!b) html += '<div class="banner warn"><span>' + t("backupNever") + ' — ' + t("backupNeverSub") + '</span><button data-act="backup-now">' + t("backupNow") + '</button></div>';
+      else if (daysSince(b) > 7) html += '<div class="banner warn"><span>' + t("backupOld", { n: daysSince(b) }) + '</span><button data-act="backup-now">' + t("backupNow") + '</button></div>';
     }
 
     html += '<div class="searchbar"><input id="search" type="search" placeholder="' + esc(t("search")) + '" value="' + esc(query) + '" autocomplete="off"></div>';
@@ -634,12 +645,37 @@
 
   function renderTools() {
     var h = '<section class="view">';
+
+    // Sync section
+    var syncState = window.VocabSync ? window.VocabSync.getState() : { status: "idle", lastSyncAt: 0 };
+    h += '<div class="section">';
+    h += '<h2>' + t("syncTitle") + '</h2>';
+    h += '<p class="desc">' + t("syncDesc") + '</p>';
+    if (syncState.status === "idle" && !syncState.userId) {
+      h += '<div class="row"><button data-act="sync-login" class="primary">' + t("syncLogin") + '</button></div>';
+    } else {
+      var stLabel = syncState.status === "ok" ? t("syncStatusOk") :
+        syncState.status === "syncing" ? t("syncStatusSyncing") :
+        syncState.status === "error" ? (t("syncStatusError") + ": " + (syncState.errorMsg || "")) :
+        t("syncStatusIdle");
+      var lastLabel = syncState.lastSyncAt ? t("syncLastAt", { t: new Date(syncState.lastSyncAt).toLocaleString() }) : t("syncNever");
+      h += '<p style="font-size:0.88rem;color:var(--text-soft);margin:8px 0 4px"><b>' + esc(stLabel) + '</b></p>';
+      h += '<p class="desc" style="margin-top:0">' + esc(lastLabel) + '</p>';
+      h += '<div class="row">';
+      h += '<button data-act="sync-now" class="primary">' + t("syncNow") + '</button>';
+      h += '<button data-act="sync-logout">' + t("syncLogout") + '</button>';
+      h += '</div>';
+    }
+    h += '</div>';
+
+    // History section
     h += '<div class="section">';
     h += '<h2>' + t("historyTitle") + '</h2>';
     h += '<p class="desc">' + t("historyDesc") + '</p>';
     h += '<div class="row"><button data-act="open-history" class="primary">' + t("historyTitle") + '</button></div>';
     h += '</div>';
 
+    // Export
     h += '<div class="section">';
     h += '<h2>' + t("exportTitle") + '</h2>';
     h += '<p class="desc">' + t("exportDesc") + '</p>';
@@ -656,6 +692,7 @@
     }
     h += '</div>';
 
+    // Import
     h += '<div class="section">';
     h += '<h2>' + t("importTitle") + '</h2>';
     h += '<p class="desc">' + t("importDesc") + '</p>';
@@ -668,6 +705,7 @@
     h += '</label>';
     h += '<div class="row"><button data-act="import-do" class="primary">' + t("importBtn") + '</button></div>';
     h += '</div>';
+
     h += '</section>';
 
     $("app").innerHTML = h;
@@ -735,6 +773,7 @@
     editingId = null;
     toast(t("saved"));
     go("words");
+    backgroundSync();
   }
 
   async function deleteWord(id) {
@@ -746,6 +785,7 @@
     await dbPutWord(w);
     toast(t("deleted"));
     go("words");
+    backgroundSync();
   }
 
   async function restoreWord(id) {
@@ -758,6 +798,7 @@
     await dbPutWord(w);
     toast(t("restored"));
     go("words");
+    backgroundSync();
   }
 
   async function deleteForever(id) {
@@ -766,6 +807,7 @@
     words = words.filter(function (w) { return w.id !== id; });
     toast(t("permDeleted"));
     render();
+    backgroundSync();
   }
 
   async function emptyTrash() {
@@ -775,6 +817,7 @@
     words = words.filter(function (w) { return !w.deleted; });
     toast(t("trashEmptied"));
     render();
+    backgroundSync();
   }
 
   function exportJson() {
@@ -837,6 +880,7 @@
       await importLines(text);
     }
     go("words");
+    backgroundSync();
   }
 
   async function importLines(text) {
@@ -967,7 +1011,26 @@
     else if (view === "history") go("history");
   }
 
-  document.addEventListener("click", function (e) {
+  /* ---------- Background sync ---------- */
+  var syncDebounce = null;
+  function backgroundSync() {
+    if (!window.VocabSync) return;
+    var st = window.VocabSync.getState();
+    if (!st.userId || !st.accessToken) return;
+    if (syncDebounce) clearTimeout(syncDebounce);
+    syncDebounce = setTimeout(async function () {
+      try {
+        var local = await collectLocalData();
+        var result = await window.VocabSync.fullSync(local);
+        if (!result.error && result.words) {
+          await applyPulledData(result);
+          if (view === "words" || view === "stats") render();
+        }
+      } catch (e) { console.error("bg sync", e); }
+    }, 1500);
+  }
+
+  document.addEventListener("click", async function (e) {
     var nav = e.target.closest("[data-nav]");
     if (nav) return go(nav.dataset.nav);
 
@@ -1001,6 +1064,37 @@
     else if (act === "import-do") doImport();
     else if (act === "backup-now") go("tools");
     else if (act === "open-history") go("history");
+    else if (act === "sync-login") {
+      if (window.VocabSync) {
+        var ok = await window.VocabSync.login();
+        if (ok) {
+          toast(t("syncLoginSuccess"));
+          renderTools();
+          backgroundSync();
+        } else {
+          toast(t("syncLoginFail"));
+        }
+      }
+    }
+    else if (act === "sync-now") {
+      if (window.VocabSync) {
+        var local2 = await collectLocalData();
+        var res = await window.VocabSync.fullSync(local2);
+        if (res.error) toast(t("syncStatusError"));
+        else {
+          await applyPulledData(res);
+          toast(t("syncSuccess", { p: res.pushed.words, g: (res.words || []).length }));
+          renderTools();
+        }
+      }
+    }
+    else if (act === "sync-logout") {
+      if (await confirmDialog(t("syncLogoutConfirm"))) {
+        window.VocabSync.logout();
+        toast(t("syncLoggedOut"));
+        renderTools();
+      }
+    }
   });
 
   document.addEventListener("input", function (e) {
@@ -1026,6 +1120,9 @@
       localStorage.setItem("vocab_lang", lang);
       updateLangChip();
       render();
+    }
+    if (e.target.closest("#sync-chip")) {
+      go("tools");
     }
   });
 
@@ -1053,7 +1150,16 @@
 
       updateLangChip();
       go("words");
+
+      // Auto-init sync if VocabSync available
+      if (window.VocabSync) {
+        window.VocabSync.subscribe(function () { renderSyncChip(); });
+        var loggedIn = await window.VocabSync.init();
+        if (loggedIn) backgroundSync();
+      }
+
     } catch (err) {
+      console.error(err);
       $("app").innerHTML = '<section class="view"><div class="empty"><p class="title">Storage error</p><p>IndexedDB is not available in this browser.</p></div></section>';
     }
   }
