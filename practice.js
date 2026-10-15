@@ -34,6 +34,8 @@
       pool = pool.filter(function (w) { return !w.practiced; });
     } else if (setup.source === "wrong") {
       pool = pool.filter(function (w) { return w.wrongCount && w.wrongCount > 0; });
+    } else if (setup.source === "due") {
+      pool = pool.filter(function (w) { return M.isDueToday(w.id); });
     } else if (setup.source === "range") {
       var from = setup.rangeFrom || 1;
       var to = setup.rangeTo || 99999;
@@ -67,6 +69,7 @@
     var total = getActiveWords().length;
     var notEnough = total < 4;
     var sourceWords = getSourceWords();
+    var dueCount = getActiveWords().filter(function (w) { return M.isDueToday(w.id); }).length;
 
     var h = '<section class="view">';
     h += '<div class="practice-setup">';
@@ -94,6 +97,9 @@
     h += '<button type="button" class="opt-btn' + (setup.source === "all" ? " on" : "") + '" data-set="source" data-val="all">' + t("source_all") + '</button>';
     h += '<button type="button" class="opt-btn' + (setup.source === "new" ? " on" : "") + '" data-set="source" data-val="new">' + t("source_new") + '</button>';
     h += '<button type="button" class="opt-btn' + (setup.source === "wrong" ? " on" : "") + '" data-set="source" data-val="wrong">' + t("source_wrong") + '</button>';
+    if (dueCount > 0) {
+      h += '<button type="button" class="opt-btn' + (setup.source === "due" ? " on" : "") + '" data-set="source" data-val="due">' + t("source_due") + ' (' + dueCount + ')</button>';
+    }
     h += '<button type="button" class="opt-btn' + (setup.source === "range" ? " on" : "") + '" data-set="source" data-val="range">' + t("source_range") + '</button>';
     h += '</div>';
 
@@ -107,14 +113,12 @@
         h += '<button type="button" class="opt-btn' + (on ? " on" : "") + '" data-range-from="' + r.from + '" data-range-to="' + r.to + '">' + r.label + '</button>';
       });
       h += '</div>';
-
       h += '<div style="display:flex;gap:10px;margin-top:12px">';
       h += '<div style="flex:1"><label style="display:block;font-size:0.75rem;color:var(--text-muted);margin-bottom:4px">' + t("rangeFrom") + '</label>';
       h += '<input id="range-from" type="number" min="1" value="' + (setup.rangeFrom || 1) + '" class="answer-input" style="text-align:center;padding:10px 12px;font-size:1rem"></div>';
       h += '<div style="flex:1"><label style="display:block;font-size:0.75rem;color:var(--text-muted);margin-bottom:4px">' + t("rangeTo") + '</label>';
       h += '<input id="range-to" type="number" min="1" value="' + (setup.rangeTo || 20) + '" class="answer-input" style="text-align:center;padding:10px 12px;font-size:1rem"></div>';
       h += '</div>';
-
       h += '<p style="font-size:0.85rem;color:var(--text-muted);margin:10px 0 0;text-align:center">' + sourceWords.length + ' ' + t("rangeWordsFound") + '</p>';
       h += '</div>';
     }
@@ -122,13 +126,9 @@
     h += '</div>';
 
     h += '<button type="button" class="practice-start" ' + (notEnough ? "disabled" : "") + ' data-act="practice-start">' + t("startPractice") + '</button>';
+    if (notEnough) h += '<p class="muted center" style="margin-top:12px">' + t("practiceNoWords") + '</p>';
 
-    if (notEnough) {
-      h += '<p class="muted center" style="margin-top:12px">' + t("practiceNoWords") + '</p>';
-    }
-
-    h += '</div>';
-    h += '</section>';
+    h += '</div></section>';
 
     M.getAppEl().innerHTML = h;
     M.setTitle(t("practice"));
@@ -139,9 +139,7 @@
     var fromInp = document.getElementById("range-from");
     var toInp = document.getElementById("range-to");
     if (fromInp) {
-      fromInp.addEventListener("input", function () {
-        setup.rangeFrom = parseInt(fromInp.value, 10) || 1;
-      });
+      fromInp.addEventListener("input", function () { setup.rangeFrom = parseInt(fromInp.value, 10) || 1; });
       fromInp.addEventListener("change", function () {
         setup.rangeFrom = parseInt(fromInp.value, 10) || 1;
         if (setup.rangeTo && setup.rangeFrom > setup.rangeTo) setup.rangeTo = setup.rangeFrom;
@@ -149,9 +147,7 @@
       });
     }
     if (toInp) {
-      toInp.addEventListener("input", function () {
-        setup.rangeTo = parseInt(toInp.value, 10) || 1;
-      });
+      toInp.addEventListener("input", function () { setup.rangeTo = parseInt(toInp.value, 10) || 1; });
       toInp.addEventListener("change", function () {
         setup.rangeTo = parseInt(toInp.value, 10) || 1;
         if (setup.rangeFrom && setup.rangeTo < setup.rangeFrom) setup.rangeFrom = setup.rangeTo;
@@ -162,11 +158,8 @@
 
   function startSession(customQuestions) {
     var pool;
-    if (customQuestions && customQuestions.length) {
-      pool = customQuestions;
-    } else {
-      pool = getSourceWords();
-    }
+    if (customQuestions && customQuestions.length) pool = customQuestions;
+    else pool = getSourceWords();
     if (pool.length < 1) { toast(t("notEnoughWords")); return; }
 
     var picked = customQuestions ? pool.slice() : pool.slice().sort(function () { return Math.random() - 0.5; }).slice(0, Math.min(setup.count, pool.length));
@@ -215,9 +208,7 @@
   function resetIdle() {
     if (idleHandle) clearTimeout(idleHandle);
     idleHandle = setTimeout(function () {
-      if (session && !session.paused && !session.answered) {
-        doPause(true);
-      }
+      if (session && !session.paused && !session.answered) doPause(true);
     }, IDLE_MS);
   }
 
@@ -246,46 +237,33 @@
     renderQuestion();
   }
 
-  function currentWord() {
-    return session.questions[session.current];
-  }
-
-  function normalize(s) {
-    return String(s || "").trim().toLowerCase().replace(/\s+/g, " ");
-  }
+  function currentWord() { return session.questions[session.current]; }
+  function normalize(s) { return String(s || "").trim().toLowerCase().replace(/\s+/g, " "); }
 
   function checkAnswer(word, userInput) {
     var user = normalize(userInput);
     if (!user) return false;
-
-    if (session.mode === "bn_en") {
-      return normalize(word.en) === user;
-    } else {
-      var userParts = user.split(/[,;،]+/).map(function (s) { return s.trim(); }).filter(Boolean);
-      for (var i = 0; i < userParts.length; i++) {
-        var up = userParts[i];
-        for (var j = 0; j < word.bn.length; j++) {
-          var wp = normalize(word.bn[j]);
-          if (wp === up) return true;
-          if (wp.indexOf(up) > -1 && up.length >= 2) return true;
-        }
+    if (session.mode === "bn_en") return normalize(word.en) === user;
+    var userParts = user.split(/[,;،]+/).map(function (s) { return s.trim(); }).filter(Boolean);
+    for (var i = 0; i < userParts.length; i++) {
+      var up = userParts[i];
+      for (var j = 0; j < word.bn.length; j++) {
+        var wp = normalize(word.bn[j]);
+        if (wp === up) return true;
+        if (wp.indexOf(up) > -1 && up.length >= 2) return true;
       }
-      var joined = word.bn.map(normalize).join(", ");
-      if (joined === user) return true;
-      return false;
     }
+    return word.bn.map(normalize).join(", ") === user;
   }
 
   function getCorrectAnswerText(word) {
     if (session.mode === "bn_en") return word.en;
     return word.bn.join(", ");
   }
-
   function getQuestionText(word) {
     if (session.mode === "bn_en") return word.bn.join(", ");
     return word.en;
   }
-
   function getQuestionLabel() {
     return session.mode === "bn_en" ? "বাংলা" : "English";
   }
@@ -299,9 +277,7 @@
     var pct = ((session.current) / total) * 100;
 
     var h = '<section class="view practice-session">';
-
     h += '<div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%"></div></div>';
-
     h += '<div class="q-counter">';
     h += '<span>' + t("questionOf", { n: n, total: total }) + '</span>';
     h += '<span style="display:flex;align-items:center;gap:8px">';
@@ -309,12 +285,9 @@
     if (!session.answered) {
       h += '<button type="button" data-act="practice-pause" style="background:transparent;border:1.5px solid var(--border);color:var(--text-soft);border-radius:8px;padding:4px 10px;font-size:0.75rem;font-weight:600;cursor:pointer">' + (session.paused ? "▶" : "⏸") + '</button>';
     }
-    h += '</span>';
-    h += '</div>';
+    h += '</span></div>';
 
-    if (session.paused) {
-      h += '<div class="feedback" style="background:var(--warn-soft);color:var(--warn);border:1px solid rgba(217,119,6,0.25);text-align:center;font-weight:600">⏸ ' + t("pausedLabel") + '</div>';
-    }
+    if (session.paused) h += '<div class="feedback" style="background:var(--warn-soft);color:var(--warn);border:1px solid rgba(217,119,6,0.25);text-align:center;font-weight:600">⏸ ' + t("pausedLabel") + '</div>';
 
     h += '<div class="question-card">';
     h += '<div class="question-prompt">' + esc(getQuestionLabel()) + '</div>';
@@ -323,33 +296,24 @@
 
     h += '<div class="answer-area">';
     var inputClass = "answer-input";
-    if (session.answered) {
-      inputClass += session.answers[session.current].correct ? " correct" : " wrong";
-    }
+    if (session.answered) inputClass += session.answers[session.current].correct ? " correct" : " wrong";
     h += '<input id="answer" type="text" class="' + inputClass + '" placeholder="' + esc(t("typeYourAnswer")) + '" value="' + esc(session.userAnswer) + '" autocomplete="off" autocapitalize="off" spellcheck="false"' + (session.answered || session.paused ? " readonly" : "") + '>';
     h += '</div>';
 
     if (session.answered) {
       var ans = session.answers[session.current];
-      if (ans.correct) {
-        h += '<div class="feedback correct">✓ ' + t("correctLabel") + '</div>';
-      } else {
-        h += '<div class="feedback wrong">✗ ' + t("wrongLabel") + '<span class="correct-answer">' + t("correctAnswerWas") + ' <b>' + esc(getCorrectAnswerText(word)) + '</b></span></div>';
-      }
+      if (ans.correct) h += '<div class="feedback correct">✓ ' + t("correctLabel") + '</div>';
+      else h += '<div class="feedback wrong">✗ ' + t("wrongLabel") + '<span class="correct-answer">' + t("correctAnswerWas") + ' <b>' + esc(getCorrectAnswerText(word)) + '</b></span></div>';
     }
 
     h += '<div class="practice-actions">';
-    if (session.paused) {
-      h += '<button type="button" class="btn-check" data-act="practice-resume">' + t("resume") + '</button>';
-    } else if (!session.answered) {
-      h += '<button type="button" class="btn-check" data-act="practice-check">' + t("check") + '</button>';
-    } else {
+    if (session.paused) h += '<button type="button" class="btn-check" data-act="practice-resume">' + t("resume") + '</button>';
+    else if (!session.answered) h += '<button type="button" class="btn-check" data-act="practice-check">' + t("check") + '</button>';
+    else {
       var isLast = session.current === session.questions.length - 1;
       h += '<button type="button" class="btn-next" data-act="practice-next">' + (isLast ? t("finish") : t("next")) + '</button>';
     }
-    h += '</div>';
-
-    h += '</section>';
+    h += '</div></section>';
 
     M.getAppEl().innerHTML = h;
     M.setTitle(t("practice"));
@@ -361,15 +325,9 @@
       var inp = document.getElementById("answer");
       if (inp) {
         setTimeout(function () { inp.focus(); }, 100);
-        inp.addEventListener("input", function () {
-          session.userAnswer = inp.value;
-          resetIdle();
-        });
+        inp.addEventListener("input", function () { session.userAnswer = inp.value; resetIdle(); });
         inp.addEventListener("keydown", function (e) {
-          if (e.key === "Enter") {
-            e.preventDefault();
-            doCheck();
-          }
+          if (e.key === "Enter") { e.preventDefault(); doCheck(); }
         });
       }
     }
@@ -397,13 +355,8 @@
     session.userAnswer = "";
     session.current++;
     session.questionStartAt = Date.now();
-
-    if (session.current >= session.questions.length) {
-      finishSession();
-    } else {
-      resetIdle();
-      renderQuestion();
-    }
+    if (session.current >= session.questions.length) finishSession();
+    else { resetIdle(); renderQuestion(); }
   }
 
   async function finishSession() {
@@ -432,6 +385,14 @@
       if (M.sessions && Array.isArray(M.sessions)) M.sessions.unshift(se);
     } catch (e) { console.error(e); }
 
+    // Update review state per word
+    try {
+      for (var i = 0; i < session.answers.length; i++) {
+        var a = session.answers[i];
+        await M.updateReviewAfterAnswer(a.id, a.correct);
+      }
+    } catch (e) { console.error(e); }
+
     renderResult(correct, total, pct, totalMs, avgMs);
     saveSessionStats();
   }
@@ -442,7 +403,6 @@
 
     var h = '<section class="view">';
     h += '<div class="result-card">';
-
     h += '<div class="result-emoji">' + emoji + '</div>';
     h += '<h2 class="result-title">' + title + '</h2>';
     h += '<p class="result-sub">' + t("youGot", { c: correct, t: total }) + '</p>';
@@ -458,13 +418,11 @@
     h += '<div><span class="num" style="font-size:1.3rem">' + fmtTime(avgMs) + '</span><span class="lbl">' + t("avgTime") + '</span></div>';
     h += '</div>';
 
-    // Details toggle button
     h += '<div style="margin-top:16px"><button type="button" data-act="toggle-details" style="width:100%;padding:12px;border:1.5px solid var(--border);background:var(--card);color:var(--text-soft);border-radius:12px;font:inherit;font-weight:600;font-size:0.9rem;cursor:pointer">' + (showDetails ? "▲ " + t("hideDetails") : "▼ " + t("viewDetails")) + '</button></div>';
 
-    // Details content
     if (showDetails) {
       h += '<div style="margin-top:12px;text-align:left">';
-      session.answers.forEach(function (a, i) {
+      session.answers.forEach(function (a) {
         var w = M.words.find(function (x) { return x.id === a.id; });
         if (!w) return;
         var sec = Math.round(a.timeMs / 1000);
@@ -488,17 +446,14 @@
 
     h += '<div class="practice-actions" style="margin-top:20px">';
     h += '<button type="button" class="btn-next" data-act="practice-again">' + t("tryAgain") + '</button>';
-    if (correct < total) {
-      h += '<button type="button" class="btn-check" data-act="practice-wrong">' + t("practiceWrong") + '</button>';
-    }
+    if (correct < total) h += '<button type="button" class="btn-check" data-act="practice-wrong">' + t("practiceWrong") + '</button>';
     h += '</div>';
 
     h += '<div class="practice-actions" style="margin-top:10px">';
     h += '<button type="button" class="btn-check" data-act="practice-done" style="background:var(--surface);color:var(--text);border:1.5px solid var(--border)">' + t("done") + '</button>';
     h += '</div>';
 
-    h += '</div>';
-    h += '</section>';
+    h += '</div></section>';
 
     M.getAppEl().innerHTML = h;
     M.setTitle(t("practice"));
@@ -513,11 +468,8 @@
       var w = M.words.find(function (x) { return x.id === a.id; });
       if (!w) continue;
       w.practiced = true;
-      if (a.correct) {
-        w.correctCount = (w.correctCount || 0) + 1;
-      } else {
-        w.wrongCount = (w.wrongCount || 0) + 1;
-      }
+      if (a.correct) w.correctCount = (w.correctCount || 0) + 1;
+      else w.wrongCount = (w.wrongCount || 0) + 1;
       w.lastPracticed = Date.now();
       w.updated = Date.now();
       try { await M.dbPutWord(w); } catch (e) {}
@@ -538,10 +490,7 @@
       var val = setBtn.dataset.val;
       if (key === "count") val = parseInt(val, 10);
       setup[key] = val;
-      if (key === "source" && val !== "range") {
-        setup.rangeFrom = null;
-        setup.rangeTo = null;
-      }
+      if (key === "source" && val !== "range") { setup.rangeFrom = null; setup.rangeTo = null; }
       renderSetup();
       return true;
     }
@@ -556,7 +505,6 @@
 
     var act = e.target.closest("[data-act]");
     if (!act) return false;
-
     var a = act.dataset.act;
 
     if (a === "practice-start") { startSession(); return true; }
@@ -574,23 +522,15 @@
         var correct = session.answers.filter(function (x) { return x.correct; }).length;
         var total = session.questions.length;
         var pct = Math.round((correct / total) * 100);
-        var totalMs = session.elapsedMs;
-        var avgMs = Math.round(totalMs / total);
-        renderResult(correct, total, pct, totalMs, avgMs);
+        renderResult(correct, total, pct, session.elapsedMs, Math.round(session.elapsedMs / total));
       }
       return true;
     }
-    if (a === "practice-again") {
-      stopTimer(); session = null; showDetails = false; renderSetup(); return true;
-    }
+    if (a === "practice-again") { stopTimer(); session = null; showDetails = false; renderSetup(); return true; }
     if (a === "practice-wrong") {
       var wrongIds = session.answers.filter(function (x) { return !x.correct; }).map(function (x) { return x.id; });
-      var wrongWords = M.words.filter(function (w) {
-        return wrongIds.indexOf(w.id) > -1;
-      });
-      stopTimer();
-      session = null;
-      showDetails = false;
+      var wrongWords = M.words.filter(function (w) { return wrongIds.indexOf(w.id) > -1; });
+      stopTimer(); session = null; showDetails = false;
       if (wrongWords.length) startSession(wrongWords);
       return true;
     }
@@ -600,25 +540,17 @@
       if (navWords) navWords.click();
       return true;
     }
-
     return false;
   }
 
-  window.Practice = {
-    open: open,
-    handleClick: handleClick
-  };
+  window.Practice = { open: open, handleClick: handleClick };
 
   document.addEventListener("click", function (e) {
-    if (handleClick(e)) {
-      e.stopPropagation();
-    }
+    if (handleClick(e)) e.stopPropagation();
   }, true);
 
   document.addEventListener("visibilitychange", function () {
-    if (document.hidden && session && !session.paused && !session.answered) {
-      doPause(true);
-    }
+    if (document.hidden && session && !session.paused && !session.answered) doPause(true);
   });
 
 })();
