@@ -104,7 +104,25 @@
       resumed: "Resumed",
       resume: "Resume",
       totalTime: "Total time",
-      avgTime: "Avg / question"
+      avgTime: "Avg / question",
+      viewDetails: "View details",
+      hideDetails: "Hide details",
+      practiceWrong: "Practice wrong",
+      youWrote: "You wrote:",
+      correctAnswer: "Correct answer:",
+      historyTitle: "Practice history",
+      historyDesc: "Your past practice sessions.",
+      historyEmpty: "No sessions yet",
+      historyEmptySub: "Complete a practice session to see it here.",
+      historyToday: "Today",
+      historyYesterday: "Yesterday",
+      historySession: "Session",
+      historyMode: "Mode",
+      historyScore: "Score",
+      historyTime: "Time",
+      historyClear: "Clear history",
+      historyClearConfirm: "Delete all practice history?",
+      historyCleared: "History cleared"
     },
     bn: {
       words: "শব্দ", trash: "ট্র্যাশ", tools: "টুলস", practice: "প্র্যাকটিস",
@@ -198,7 +216,25 @@
       resumed: "চালু হয়েছে",
       resume: "চালু করুন",
       totalTime: "মোট সময়",
-      avgTime: "গড় / প্রশ্ন"
+      avgTime: "গড় / প্রশ্ন",
+      viewDetails: "বিস্তারিত দেখুন",
+      hideDetails: "বিস্তারিত লুকান",
+      practiceWrong: "ভুলগুলো প্র্যাকটিস",
+      youWrote: "আপনি লিখেছেন:",
+      correctAnswer: "সঠিক উত্তর:",
+      historyTitle: "প্র্যাকটিস হিস্ট্রি",
+      historyDesc: "আপনার আগের প্র্যাকটিস সেশন।",
+      historyEmpty: "এখনো কোনো সেশন নেই",
+      historyEmptySub: "একটি প্র্যাকটিস সেশন সম্পন্ন করলে এখানে দেখা যাবে।",
+      historyToday: "আজ",
+      historyYesterday: "গতকাল",
+      historySession: "সেশন",
+      historyMode: "মোড",
+      historyScore: "স্কোর",
+      historyTime: "সময়",
+      historyClear: "হিস্ট্রি মুছুন",
+      historyClearConfirm: "সব প্র্যাকটিস হিস্ট্রি মুছবেন?",
+      historyCleared: "হিস্ট্রি মুছে ফেলা হয়েছে"
     }
   };
 
@@ -206,6 +242,7 @@
 
   var lang = localStorage.getItem("vocab_lang") === "bn" ? "bn" : "en";
   var words = [];
+  var sessions = [];
   var db = null;
   var view = "words";
   var editingId = null;
@@ -269,14 +306,17 @@
 
   function openDB() {
     return new Promise(function (resolve, reject) {
-      var req = indexedDB.open("vocab_db", 1);
-      req.onupgradeneeded = function () {
+      var req = indexedDB.open("vocab_db", 2);
+      req.onupgradeneeded = function (ev) {
         var d = req.result;
         if (!d.objectStoreNames.contains("words")) {
           d.createObjectStore("words", { keyPath: "id" });
         }
         if (!d.objectStoreNames.contains("meta")) {
           d.createObjectStore("meta", { keyPath: "k" });
+        }
+        if (!d.objectStoreNames.contains("sessions")) {
+          d.createObjectStore("sessions", { keyPath: "id" });
         }
       };
       req.onsuccess = function () { db = req.result; resolve(); };
@@ -295,8 +335,20 @@
   function dbGetAllWords() {
     return txStore("words", "readonly", function (s) { return s.getAll(); });
   }
+  function dbGetAllSessions() {
+    return txStore("sessions", "readonly", function (s) { return s.getAll(); });
+  }
   function dbPutWord(w) {
     return txStore("words", "readwrite", function (s) { s.put(w); });
+  }
+  function dbPutSession(se) {
+    return txStore("sessions", "readwrite", function (s) { s.put(se); });
+  }
+  function dbDeleteSession(id) {
+    return txStore("sessions", "readwrite", function (s) { s.delete(id); });
+  }
+  function dbClearSessions() {
+    return txStore("sessions", "readwrite", function (s) { s.clear(); });
   }
   function dbPutWords(ws) {
     return txStore("words", "readwrite", function (s) {
@@ -341,6 +393,7 @@
 
   window.VocabMain = {
     get words() { return words; },
+    get sessions() { return sessions; },
     get lang() { return lang; },
     t: t,
     esc: esc,
@@ -348,8 +401,12 @@
     toast: toast,
     confirmDialog: confirmDialog,
     dbPutWord: dbPutWord,
+    dbPutSession: dbPutSession,
+    dbGetAllSessions: dbGetAllSessions,
+    dbClearSessions: dbClearSessions,
     metaGet: metaGet,
     metaSet: metaSet,
+    daysSince: daysSince,
     setTitle: function (s) { var el = $("title"); if (el) el.textContent = s; },
     setActiveNav: function (k) {
       document.querySelectorAll(".navbtn").forEach(function (b) {
@@ -587,6 +644,16 @@ function renderTrash() {
 function renderTools() {
   var h = '<section class="view">';
 
+  // History section
+  h += '<div class="section">';
+  h += '<h2>' + t("historyTitle") + '</h2>';
+  h += '<p class="desc">' + t("historyDesc") + '</p>';
+  h += '<div class="row">';
+  h += '<button data-act="open-history" class="primary">' + t("historyTitle") + '</button>';
+  h += '</div>';
+  h += '</div>';
+
+  // Export section
   h += '<div class="section">';
   h += '<h2>' + t("exportTitle") + '</h2>';
   h += '<p class="desc">' + t("exportDesc") + '</p>';
@@ -603,6 +670,7 @@ function renderTools() {
   }
   h += '</div>';
 
+  // Import section
   h += '<div class="section">';
   h += '<h2>' + t("importTitle") + '</h2>';
   h += '<p class="desc">' + t("importDesc") + '</p>';
@@ -938,6 +1006,17 @@ function updateLangChip() {
     else if (v === "trash") renderTrash();
     else if (v === "tools") renderTools();
     else if (v === "add") renderForm();
+    else if (v === "history") {
+      if (window.History && window.History.open) {
+        window.History.open();
+      } else {
+        $("app").innerHTML = '<section class="view"><div class="empty"><p class="title">' + t("historyEmpty") + '</p></div></section>';
+        setTitle(t("historyTitle"));
+        setActiveNav("tools");
+        showFab(false);
+        showBack(true);
+      }
+    }
   }
 
   function render() {
@@ -946,6 +1025,7 @@ function updateLangChip() {
     else if (view === "trash") renderTrash();
     else if (view === "tools") renderTools();
     else if (view === "add") renderForm();
+    else if (view === "history") go("history");
   }
 
   document.addEventListener("click", function (e) {
@@ -985,6 +1065,7 @@ function updateLangChip() {
     else if (act === "download-export") downloadExport();
     else if (act === "import-do") doImport();
     else if (act === "backup-now") go("tools");
+    else if (act === "open-history") go("history");
   });
 
   document.addEventListener("input", function (e) {
@@ -1021,8 +1102,10 @@ function updateLangChip() {
   async function init() {
     try {
       await openDB();
-      var all = await dbGetAllWords();
-      words = all || [];
+      var allWords = await dbGetAllWords();
+      words = allWords || [];
+      var allSessions = await dbGetAllSessions();
+      sessions = (allSessions || []).sort(function (a, b) { return b.date - a.date; });
       lastBackup = (await metaGet("lastBackup")) || 0;
 
       if (!words.length && (await metaGet("nextNo")) === undefined) {
