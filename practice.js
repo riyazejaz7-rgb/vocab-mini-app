@@ -6,6 +6,7 @@
 
   var t = M.t;
   var esc = M.esc;
+  var uid = M.uid;
   var toast = M.toast;
 
   var setup = {
@@ -19,6 +20,7 @@
   var session = null;
   var timerHandle = null;
   var idleHandle = null;
+  var showDetails = false;
 
   var IDLE_MS = 2 * 60 * 1000;
 
@@ -158,12 +160,16 @@
     }
   }
 
-  function startSession() {
-    var pool = getSourceWords();
-    if (pool.length < 4) { toast(t("notEnoughWords")); return; }
+  function startSession(customQuestions) {
+    var pool;
+    if (customQuestions && customQuestions.length) {
+      pool = customQuestions;
+    } else {
+      pool = getSourceWords();
+    }
+    if (pool.length < 1) { toast(t("notEnoughWords")); return; }
 
-    var shuffled = pool.slice().sort(function () { return Math.random() - 0.5; });
-    var picked = shuffled.slice(0, Math.min(setup.count, shuffled.length));
+    var picked = customQuestions ? pool.slice() : pool.slice().sort(function () { return Math.random() - 0.5; }).slice(0, Math.min(setup.count, pool.length));
     var now = Date.now();
 
     session = {
@@ -181,6 +187,7 @@
       totalPausedMs: 0
     };
 
+    showDetails = false;
     startTimer();
     renderQuestion();
   }
@@ -217,8 +224,6 @@
   function updateTimerDisplay() {
     var el = document.getElementById("timer");
     if (el && session) el.textContent = fmtTime(session.elapsedMs);
-    var pe = document.getElementById("timer-paused");
-    if (pe) pe.classList.toggle("hidden", !session.paused);
   }
 
   function doPause(auto) {
@@ -240,6 +245,7 @@
     toast(t("resumed"));
     renderQuestion();
   }
+
   function currentWord() {
     return session.questions[session.current];
   }
@@ -301,7 +307,7 @@
     h += '<span style="display:flex;align-items:center;gap:8px">';
     h += '<span id="timer" style="font-family:ui-monospace,monospace;font-weight:700;color:var(--accent)">' + fmtTime(session.elapsedMs) + '</span>';
     if (!session.answered) {
-      h += '<button type="button" data-act="practice-pause" style="background:transparent;border:1.5px solid var(--border);color:var(--text-soft);border-radius:8px;padding:4px 10px;font-size:0.75rem;font-weight:600;cursor:pointer" id="pause-btn">' + (session.paused ? "▶" : "⏸") + '</button>';
+      h += '<button type="button" data-act="practice-pause" style="background:transparent;border:1.5px solid var(--border);color:var(--text-soft);border-radius:8px;padding:4px 10px;font-size:0.75rem;font-weight:600;cursor:pointer">' + (session.paused ? "▶" : "⏸") + '</button>';
     }
     h += '</span>';
     h += '</div>';
@@ -320,8 +326,7 @@
     if (session.answered) {
       inputClass += session.answers[session.current].correct ? " correct" : " wrong";
     }
-    var disabled = session.paused ? " disabled" : "";
-    h += '<input id="answer" type="text" class="' + inputClass + '" placeholder="' + esc(t("typeYourAnswer")) + '" value="' + esc(session.userAnswer) + '" autocomplete="off" autocapitalize="off" spellcheck="false"' + (session.answered || session.paused ? " readonly" : "") + disabled + '>';
+    h += '<input id="answer" type="text" class="' + inputClass + '" placeholder="' + esc(t("typeYourAnswer")) + '" value="' + esc(session.userAnswer) + '" autocomplete="off" autocapitalize="off" spellcheck="false"' + (session.answered || session.paused ? " readonly" : "") + '>';
     h += '</div>';
 
     if (session.answered) {
@@ -401,7 +406,7 @@
     }
   }
 
-  function finishSession() {
+  async function finishSession() {
     stopTimer();
 
     var correct = session.answers.filter(function (a) { return a.correct; }).length;
@@ -410,11 +415,33 @@
     var totalMs = session.elapsedMs;
     var avgMs = Math.round(totalMs / total);
 
-    var h = '<section class="view">';
-    h += '<div class="result-card">';
+    // Save session
+    try {
+      var se = {
+        id: uid(),
+        date: session.startedAt,
+        mode: session.mode,
+        total: total,
+        correct: correct,
+        durationMs: totalMs,
+        answers: session.answers.map(function (a) {
+          return { id: a.id, correct: a.correct, userAnswer: a.userAnswer, timeMs: a.timeMs };
+        })
+      };
+      await M.dbPutSession(se);
+      if (M.sessions && Array.isArray(M.sessions)) M.sessions.unshift(se);
+    } catch (e) { console.error(e); }
 
+    renderResult(correct, total, pct, totalMs, avgMs);
+    saveSessionStats();
+  }
+
+  function renderResult(correct, total, pct, totalMs, avgMs) {
     var emoji = pct >= 80 ? "🎉" : pct >= 50 ? "👍" : "💪";
     var title = pct >= 80 ? t("resultGreat") : pct >= 50 ? t("resultGood") : t("resultOk");
+
+    var h = '<section class="view">';
+    h += '<div class="result-card">';
 
     h += '<div class="result-emoji">' + emoji + '</div>';
     h += '<h2 class="result-title">' + title + '</h2>';
@@ -431,9 +458,43 @@
     h += '<div><span class="num" style="font-size:1.3rem">' + fmtTime(avgMs) + '</span><span class="lbl">' + t("avgTime") + '</span></div>';
     h += '</div>';
 
-    h += '<div class="practice-actions" style="margin-top:24px">';
+    // Details toggle button
+    h += '<div style="margin-top:16px"><button type="button" data-act="toggle-details" style="width:100%;padding:12px;border:1.5px solid var(--border);background:var(--card);color:var(--text-soft);border-radius:12px;font:inherit;font-weight:600;font-size:0.9rem;cursor:pointer">' + (showDetails ? "▲ " + t("hideDetails") : "▼ " + t("viewDetails")) + '</button></div>';
+
+    // Details content
+    if (showDetails) {
+      h += '<div style="margin-top:12px;text-align:left">';
+      session.answers.forEach(function (a, i) {
+        var w = M.words.find(function (x) { return x.id === a.id; });
+        if (!w) return;
+        var sec = Math.round(a.timeMs / 1000);
+        h += '<div style="padding:10px 12px;margin-bottom:6px;background:var(--surface);border-radius:10px;border-left:3px solid ' + (a.correct ? "var(--ok)" : "var(--danger)") + '">';
+        h += '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px">';
+        h += '<div><span style="font-weight:700;color:' + (a.correct ? "var(--ok)" : "var(--danger)") + '">' + (a.correct ? "✓" : "✗") + '</span> ';
+        h += '<span style="font-size:0.75rem;color:var(--text-muted);font-weight:700">#' + w.no + '</span> ';
+        h += '<span style="font-weight:600">' + esc(w.en) + '</span></div>';
+        h += '<span style="font-size:0.75rem;color:var(--text-muted);font-family:ui-monospace,monospace">' + sec + 's</span>';
+        h += '</div>';
+        if (!a.correct) {
+          h += '<div style="font-size:0.82rem;color:var(--text-muted);margin-top:6px">';
+          h += '<span>' + t("youWrote") + ' <b style="color:var(--danger)">' + esc(a.userAnswer || "(empty)") + '</b></span><br>';
+          h += '<span>' + t("correctAnswer") + ' <b style="color:var(--ok)">' + esc(getCorrectAnswerText(w)) + '</b></span>';
+          h += '</div>';
+        }
+        h += '</div>';
+      });
+      h += '</div>';
+    }
+
+    h += '<div class="practice-actions" style="margin-top:20px">';
     h += '<button type="button" class="btn-next" data-act="practice-again">' + t("tryAgain") + '</button>';
-    h += '<button type="button" class="btn-check" data-act="practice-done">' + t("done") + '</button>';
+    if (correct < total) {
+      h += '<button type="button" class="btn-check" data-act="practice-wrong">' + t("practiceWrong") + '</button>';
+    }
+    h += '</div>';
+
+    h += '<div class="practice-actions" style="margin-top:10px">';
+    h += '<button type="button" class="btn-check" data-act="practice-done" style="background:var(--surface);color:var(--text);border:1.5px solid var(--border)">' + t("done") + '</button>';
     h += '</div>';
 
     h += '</div>';
@@ -444,8 +505,6 @@
     M.setActiveNav("practice");
     M.showFab(false);
     M.showBack(false);
-
-    saveSessionStats();
   }
 
   async function saveSessionStats() {
@@ -468,6 +527,7 @@
   function open() {
     stopTimer();
     session = null;
+    showDetails = false;
     renderSetup();
   }
 
@@ -508,10 +568,34 @@
       return true;
     }
     if (a === "practice-resume") { doResume(); return true; }
-    if (a === "practice-again") { stopTimer(); session = null; renderSetup(); return true; }
-    if (a === "practice-done") {
+    if (a === "toggle-details") {
+      showDetails = !showDetails;
+      if (session) {
+        var correct = session.answers.filter(function (x) { return x.correct; }).length;
+        var total = session.questions.length;
+        var pct = Math.round((correct / total) * 100);
+        var totalMs = session.elapsedMs;
+        var avgMs = Math.round(totalMs / total);
+        renderResult(correct, total, pct, totalMs, avgMs);
+      }
+      return true;
+    }
+    if (a === "practice-again") {
+      stopTimer(); session = null; showDetails = false; renderSetup(); return true;
+    }
+    if (a === "practice-wrong") {
+      var wrongIds = session.answers.filter(function (x) { return !x.correct; }).map(function (x) { return x.id; });
+      var wrongWords = M.words.filter(function (w) {
+        return wrongIds.indexOf(w.id) > -1;
+      });
       stopTimer();
       session = null;
+      showDetails = false;
+      if (wrongWords.length) startSession(wrongWords);
+      return true;
+    }
+    if (a === "practice-done") {
+      stopTimer(); session = null; showDetails = false;
       var navWords = document.querySelector('[data-nav="words"]');
       if (navWords) navWords.click();
       return true;
