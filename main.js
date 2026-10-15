@@ -97,7 +97,14 @@
       practiceNoWords: "Add at least 4 words to start practicing.",
       practiceNoWordsSub: "Tap + on the Words tab.",
       practiceComingSoon: "Practice coming soon",
-      practiceComingSoonSub: "Refresh the app to load practice mode."
+      practiceComingSoonSub: "Refresh the app to load practice mode.",
+      paused: "Paused",
+      pausedAuto: "Auto-paused (idle)",
+      pausedLabel: "Timer paused",
+      resumed: "Resumed",
+      resume: "Resume",
+      totalTime: "Total time",
+      avgTime: "Avg / question"
     },
     bn: {
       words: "শব্দ", trash: "ট্র্যাশ", tools: "টুলস", practice: "প্র্যাকটিস",
@@ -184,7 +191,14 @@
       practiceNoWords: "অন্তত ৪টি শব্দ যোগ করুন প্র্যাকটিস শুরু করতে।",
       practiceNoWordsSub: "শব্দ ট্যাবে + চাপুন।",
       practiceComingSoon: "প্র্যাকটিস শীঘ্রই আসছে",
-      practiceComingSoonSub: "অ্যাপ রিফ্রেশ করুন প্র্যাকটিস মোড লোড করতে।"
+      practiceComingSoonSub: "অ্যাপ রিফ্রেশ করুন প্র্যাকটিস মোড লোড করতে।",
+      paused: "বিরতি",
+      pausedAuto: "অটো বিরতি (idle)",
+      pausedLabel: "টাইমার বিরতিতে",
+      resumed: "চালু হয়েছে",
+      resume: "চালু করুন",
+      totalTime: "মোট সময়",
+      avgTime: "গড় / প্রশ্ন"
     }
   };
 
