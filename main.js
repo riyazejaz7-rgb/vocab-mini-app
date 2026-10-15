@@ -115,7 +115,15 @@
       syncSuccess: "Synced: +{p} words, ↓{g} words",
       syncNothing: "Already up to date",
       syncLogoutConfirm: "Log out from cloud sync?",
-      syncLoggedOut: "Logged out"
+            syncLoggedOut: "Logged out",
+      askAI: "Ask AI",
+      askAILoading: "Asking AI…",
+      askAISuccess: "AI filled the fields",
+      askAIFail: "AI could not respond",
+      aiNeedWord: "Enter the English word first",
+      aiNeedLogin: "Log in to cloud sync first",
+      aiQuotaExceeded: "AI daily limit reached",
+      aiUsedToday: "AI used today: {n}/{max}"
     },
     bn: {
       words: "শব্দ", trash: "ট্র্যাশ", tools: "টুলস", practice: "প্র্যাকটিস", stats: "স্ট্যাটস",
@@ -215,7 +223,15 @@
       syncSuccess: "সিঙ্ক: +{p} শব্দ, ↓{g} শব্দ",
       syncNothing: "আগে থেকেই আপ-টু-ডেট",
       syncLogoutConfirm: "ক্লাউড সিঙ্ক থেকে লগআউট?",
-      syncLoggedOut: "লগআউট হয়েছে"
+            syncLoggedOut: "লগআউট হয়েছে",
+      askAI: "AI দিয়ে পূরণ",
+      askAILoading: "AI জিজ্ঞেস করছি…",
+      askAISuccess: "AI ফিল্ড পূরণ করেছে",
+      askAIFail: "AI উত্তর দিতে পারল না",
+      aiNeedWord: "প্রথমে ইংরেজি শব্দ লিখুন",
+      aiNeedLogin: "প্রথমে ক্লাউড সিঙ্কে লগইন করুন",
+      aiQuotaExceeded: "আজকের AI সীমা শেষ",
+      aiUsedToday: "আজ AI ব্যবহার: {n}/{max}"
     }
   };
 
@@ -600,6 +616,10 @@
     h += '<textarea id="f_ex" rows="2">' + esc(data.ex) + '</textarea>';
     h += '<label for="f_note">' + t("notes") + ' <span class="muted">(' + t("optional") + ')</span></label>';
     h += '<textarea id="f_note" rows="2">' + esc(data.note) + '</textarea>';
+      h += '<button type="button" class="btn-ai" data-act="form-askai" id="form-askai-btn">';
+    h += '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><path d="M12 3l2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5z"/></svg>';
+    h += t("askAI");
+    h += '</button>';
     h += '<div class="form-actions">';
     h += '<button type="button" data-act="form-cancel" class="btn-secondary">' + t("cancel") + '</button>';
     h += '<button type="button" data-act="form-save" class="btn-primary">' + (isEdit ? t("saveChanges") : t("save")) + '</button>';
@@ -737,7 +757,49 @@
   function updateLangChip() {
     var c = $("lang-toggle");
     if (c) c.textContent = lang === "bn" ? "EN" : "বাং";
+  }  async function askAI() {
+    var en = ($("f_en").value || "").trim();
+    if (!en) return toast(t("aiNeedWord"));
+
+    if (!window.VocabSync || !window.VocabSync.getState().userId) {
+      return toast(t("aiNeedLogin"));
+    }
+    if (!window.VocabAI) {
+      return toast(t("askAIFail"));
+    }
+
+    var btn = $("form-askai-btn");
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = t("askAILoading");
+    }
+
+    var result = await window.VocabAI.fillWord(en);
+
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><path d="M12 3l2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5z"/></svg>' + t("askAI");
+    }
+
+    if (!result.ok) {
+      if (result.error === "quota_exceeded") return toast(t("aiQuotaExceeded"));
+      if (result.error === "not_logged_in") return toast(t("aiNeedLogin"));
+      return toast(t("askAIFail"));
+    }
+
+    var d = result.data || {};
+    if (Array.isArray(d.bn) && d.bn.length) $("f_bn").value = d.bn.join(", ");
+    if (Array.isArray(d.syn) && d.syn.length) $("f_syn").value = d.syn.join(", ");
+    if (Array.isArray(d.ant) && d.ant.length) $("f_ant").value = d.ant.join(", ");
+    if (typeof d.pos === "string" && d.pos) {
+      var posSel = $("f_pos");
+      if (posSel) posSel.value = d.pos;
+    }
+    if (typeof d.ex === "string" && d.ex) $("f_ex").value = d.ex;
+
+    toast(t("askAISuccess"));
   }
+
   async function saveWord() {
     var en = ($("f_en").value || "").trim();
     var bn = splitList($("f_bn").value);
@@ -1056,7 +1118,7 @@
     else if (act === "del-forever") deleteForever(id);
     else if (act === "empty-trash") emptyTrash();
     else if (act === "form-save") saveWord();
-    else if (act === "form-cancel") go("words");
+    else if (act === "form-cancel") go("words");    else if (act === "form-askai") askAI();
     else if (act === "export-json") exportJson();
     else if (act === "export-csv") exportCsv();
     else if (act === "copy-export") copyExport();
