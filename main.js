@@ -64,7 +64,7 @@
       pos_preposition: "preposition", pos_conjunction: "conjunction",
       pos_pronoun: "pronoun", pos_interjection: "interjection", pos_other: "other",
       practice: "Practice", practiceSetup: "Practice setup",
-      mode: "Mode", mode_bn_en: "বাংলা → English", mode_en_bn: "English → বাংলা", mode_fill: "Fill blanks",
+      mode: "Mode", mode_bn_en: "বাংলা → English", mode_en_bn: "English → বাংলা", mode_fill: "Fill in the blank",
       questionCount: "Number of questions", wordSource: "Which words",
       source_all: "All words", source_new: "New words", source_wrong: "Wrong words",
       source_range: "Range", source_due: "Due today",
@@ -115,7 +115,7 @@
       syncSuccess: "Synced: +{p} words, ↓{g} words",
       syncNothing: "Already up to date",
       syncLogoutConfirm: "Log out from cloud sync?",
-            syncLoggedOut: "Logged out",
+      syncLoggedOut: "Logged out",
       askAI: "Ask AI",
       askAILoading: "Asking AI…",
       askAISuccess: "AI filled the fields",
@@ -123,7 +123,16 @@
       aiNeedWord: "Enter the English word first",
       aiNeedLogin: "Log in to cloud sync first",
       aiQuotaExceeded: "AI daily limit reached",
-      aiUsedToday: "AI used today: {n}/{max}"
+      aiUsedToday: "AI used today: {n}/{max}",
+      fillInBlank: "Fill in the blank",
+      hint: "Hint",
+      showHint: "Show hint",
+      aiGeneratingSentences: "Generating sentences…",
+      aiPleaseWait: "Please wait a few seconds",
+      explainWithAI: "Explain with AI",
+      aiExplanation: "AI explanation",
+      aiThinking: "Thinking…",
+      aiFail: "AI could not respond"
     },
     bn: {
       words: "শব্দ", trash: "ট্র্যাশ", tools: "টুলস", practice: "প্র্যাকটিস", stats: "স্ট্যাটস",
@@ -223,7 +232,7 @@
       syncSuccess: "সিঙ্ক: +{p} শব্দ, ↓{g} শব্দ",
       syncNothing: "আগে থেকেই আপ-টু-ডেট",
       syncLogoutConfirm: "ক্লাউড সিঙ্ক থেকে লগআউট?",
-            syncLoggedOut: "লগআউট হয়েছে",
+      syncLoggedOut: "লগআউট হয়েছে",
       askAI: "AI দিয়ে পূরণ",
       askAILoading: "AI জিজ্ঞেস করছি…",
       askAISuccess: "AI ফিল্ড পূরণ করেছে",
@@ -231,7 +240,16 @@
       aiNeedWord: "প্রথমে ইংরেজি শব্দ লিখুন",
       aiNeedLogin: "প্রথমে ক্লাউড সিঙ্কে লগইন করুন",
       aiQuotaExceeded: "আজকের AI সীমা শেষ",
-      aiUsedToday: "আজ AI ব্যবহার: {n}/{max}"
+      aiUsedToday: "আজ AI ব্যবহার: {n}/{max}",
+      fillInBlank: "ফাঁকা পূরণ করুন",
+      hint: "ইঙ্গিত",
+      showHint: "ইঙ্গিত দেখুন",
+      aiGeneratingSentences: "বাক্য তৈরি হচ্ছে…",
+      aiPleaseWait: "একটু অপেক্ষা করুন",
+      explainWithAI: "AI ব্যাখ্যা করুন",
+      aiExplanation: "AI-এর ব্যাখ্যা",
+      aiThinking: "ভাবছি…",
+      aiFail: "AI উত্তর দিতে পারল না"
     }
   };
 
@@ -249,7 +267,6 @@
   var filterSource = localStorage.getItem("vocab_filter_source") || "";
   var lastBackup = 0;
   var exportBuf = { text: "", kind: "" };
-  var syncUnsub = null;
 
   function t(key, args) {
     var s = (L[lang] && L[lang][key]) || L.en[key] || key;
@@ -367,9 +384,7 @@
     if (!r.nextReview) return true;
     return r.nextReview <= Date.now();
   }
-  function getDueWords() {
-    return words.filter(function (w) { return !w.deleted && isDueToday(w.id); });
-  }
+  function getDueWords() { return words.filter(function (w) { return !w.deleted && isDueToday(w.id); }); }
   function isMastered(wordId) {
     var r = reviews[wordId];
     if (!r) return false;
@@ -400,70 +415,6 @@
     return dbPutReview(r);
   }
 
-  /* ---------- Sync helpers ---------- */
-  async function collectLocalData() {
-    return { words: words, sessions: sessions, reviews: reviews };
-  }
-  async function applyPulledData(data) {
-    if (!data) return;
-    if (Array.isArray(data.words) && data.words.length) {
-      // Merge: newest updated wins
-      var map = {};
-      words.forEach(function (w) { map[w.id] = w; });
-      data.words.forEach(function (cw) {
-        var lw = map[cw.id];
-        if (!lw || (cw.updated || 0) > (lw.updated || 0)) {
-          map[cw.id] = cw;
-        }
-      });
-      words = Object.keys(map).map(function (k) { return map[k]; });
-      await dbPutWords(words);
-    }
-    if (Array.isArray(data.sessions)) {
-      var sMap = {};
-      sessions.forEach(function (s) { sMap[s.id] = s; });
-      data.sessions.forEach(function (cs) {
-        if (!sMap[cs.id]) {
-          sMap[cs.id] = {
-            id: cs.id, date: new Date(cs.date).getTime(), mode: cs.mode,
-            total: cs.total, correct: cs.correct, durationMs: cs.duration_ms,
-            answers: cs.answers || []
-          };
-        }
-      });
-      sessions = Object.keys(sMap).map(function (k) { return sMap[k]; }).sort(function (a, b) { return b.date - a.date; });
-      for (var i = 0; i < data.sessions.length; i++) await dbPutSession(sessions.find(function (s) { return s.id === data.sessions[i].id; }));
-    }
-    if (data.reviews && typeof data.reviews === "object") {
-      Object.keys(data.reviews).forEach(function (k) {
-        var cr = data.reviews[k];
-        var lr = reviews[k];
-        if (!lr || (cr.lastReview || 0) > (lr.lastReview || 0)) {
-          reviews[k] = cr;
-        }
-      });
-      var rKeys = Object.keys(reviews);
-      for (var j = 0; j < rKeys.length; j++) await dbPutReview(reviews[rKeys[j]]);
-    }
-    await fixNextNo();
-  }
-
-  function renderSyncChip() {
-    var el = $("sync-chip");
-    if (!el || !window.VocabSync) return;
-    var st = window.VocabSync.getState();
-    var cls = "sync-chip";
-    var label = "";
-    if (st.status === "ok") { cls += " ok"; label = "☁"; }
-    else if (st.status === "syncing") { cls += " syncing"; label = "↻"; }
-    else if (st.status === "error") { cls += " error"; label = "⚠"; }
-    else if (st.status === "offline") { cls += " offline"; label = "⊘"; }
-    else { cls += " idle"; label = "☁"; }
-    el.className = cls;
-    el.textContent = label;
-    el.title = st.status + (st.errorMsg ? ": " + st.errorMsg : "");
-  }
-
   window.VocabMain = {
     get words() { return words; },
     set words(v) { words = v; },
@@ -477,9 +428,6 @@
     metaGet: metaGet, metaSet: metaSet, daysSince: daysSince,
     isDueToday: isDueToday, getDueWords: getDueWords, isMastered: isMastered,
     updateReviewAfterAnswer: updateReviewAfterAnswer,
-    getLocalData: collectLocalData,
-    applyPulledData: applyPulledData,
-    renderSyncChip: renderSyncChip,
     setTitle: function (s) { var el = $("title"); if (el) el.textContent = s; },
     setActiveNav: function (k) {
       document.querySelectorAll(".navbtn").forEach(function (b) {
@@ -616,7 +564,7 @@
     h += '<textarea id="f_ex" rows="2">' + esc(data.ex) + '</textarea>';
     h += '<label for="f_note">' + t("notes") + ' <span class="muted">(' + t("optional") + ')</span></label>';
     h += '<textarea id="f_note" rows="2">' + esc(data.note) + '</textarea>';
-      h += '<button type="button" class="btn-ai" data-act="form-askai" id="form-askai-btn">';
+    h += '<button type="button" class="btn-ai" data-act="form-askai" id="form-askai-btn">';
     h += '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><path d="M12 3l2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5z"/></svg>';
     h += t("askAI");
     h += '</button>';
@@ -666,7 +614,6 @@
   function renderTools() {
     var h = '<section class="view">';
 
-    // Sync section
     var syncState = window.VocabSync ? window.VocabSync.getState() : { status: "idle", lastSyncAt: 0 };
     h += '<div class="section">';
     h += '<h2>' + t("syncTitle") + '</h2>';
@@ -688,14 +635,12 @@
     }
     h += '</div>';
 
-    // History section
     h += '<div class="section">';
     h += '<h2>' + t("historyTitle") + '</h2>';
     h += '<p class="desc">' + t("historyDesc") + '</p>';
     h += '<div class="row"><button data-act="open-history" class="primary">' + t("historyTitle") + '</button></div>';
     h += '</div>';
 
-    // Export
     h += '<div class="section">';
     h += '<h2>' + t("exportTitle") + '</h2>';
     h += '<p class="desc">' + t("exportDesc") + '</p>';
@@ -712,7 +657,6 @@
     }
     h += '</div>';
 
-    // Import
     h += '<div class="section">';
     h += '<h2>' + t("importTitle") + '</h2>';
     h += '<p class="desc">' + t("importDesc") + '</p>';
@@ -757,22 +701,15 @@
   function updateLangChip() {
     var c = $("lang-toggle");
     if (c) c.textContent = lang === "bn" ? "EN" : "বাং";
-  }  async function askAI() {
+  }
+  async function askAI() {
     var en = ($("f_en").value || "").trim();
     if (!en) return toast(t("aiNeedWord"));
-
-    if (!window.VocabSync || !window.VocabSync.getState().userId) {
-      return toast(t("aiNeedLogin"));
-    }
-    if (!window.VocabAI) {
-      return toast(t("askAIFail"));
-    }
+    if (!window.VocabSync || !window.VocabSync.getState().userId) return toast(t("aiNeedLogin"));
+    if (!window.VocabAI) return toast(t("askAIFail"));
 
     var btn = $("form-askai-btn");
-    if (btn) {
-      btn.disabled = true;
-      btn.textContent = t("askAILoading");
-    }
+    if (btn) { btn.disabled = true; btn.textContent = t("askAILoading"); }
 
     var result = await window.VocabAI.fillWord(en);
 
@@ -796,7 +733,6 @@
       if (posSel) posSel.value = d.pos;
     }
     if (typeof d.ex === "string" && d.ex) $("f_ex").value = d.ex;
-
     toast(t("askAISuccess"));
   }
 
@@ -835,7 +771,6 @@
     editingId = null;
     toast(t("saved"));
     go("words");
-    backgroundSync();
   }
 
   async function deleteWord(id) {
@@ -847,7 +782,6 @@
     await dbPutWord(w);
     toast(t("deleted"));
     go("words");
-    backgroundSync();
   }
 
   async function restoreWord(id) {
@@ -860,7 +794,6 @@
     await dbPutWord(w);
     toast(t("restored"));
     go("words");
-    backgroundSync();
   }
 
   async function deleteForever(id) {
@@ -869,7 +802,6 @@
     words = words.filter(function (w) { return w.id !== id; });
     toast(t("permDeleted"));
     render();
-    backgroundSync();
   }
 
   async function emptyTrash() {
@@ -879,7 +811,6 @@
     words = words.filter(function (w) { return !w.deleted; });
     toast(t("trashEmptied"));
     render();
-    backgroundSync();
   }
 
   function exportJson() {
@@ -942,7 +873,6 @@
       await importLines(text);
     }
     go("words");
-    backgroundSync();
   }
 
   async function importLines(text) {
@@ -1073,25 +1003,6 @@
     else if (view === "history") go("history");
   }
 
-  /* ---------- Background sync ---------- */
-  var syncDebounce = null;
-  function backgroundSync() {
-    if (!window.VocabSync) return;
-    var st = window.VocabSync.getState();
-    if (!st.userId || !st.accessToken) return;
-    if (syncDebounce) clearTimeout(syncDebounce);
-    syncDebounce = setTimeout(async function () {
-      try {
-        var local = await collectLocalData();
-        var result = await window.VocabSync.fullSync(local);
-        if (!result.error && result.words) {
-          await applyPulledData(result);
-          if (view === "words" || view === "stats") render();
-        }
-      } catch (e) { console.error("bg sync", e); }
-    }, 1500);
-  }
-
   document.addEventListener("click", async function (e) {
     var nav = e.target.closest("[data-nav]");
     if (nav) return go(nav.dataset.nav);
@@ -1118,7 +1029,8 @@
     else if (act === "del-forever") deleteForever(id);
     else if (act === "empty-trash") emptyTrash();
     else if (act === "form-save") saveWord();
-    else if (act === "form-cancel") go("words");    else if (act === "form-askai") askAI();
+    else if (act === "form-askai") askAI();
+    else if (act === "form-cancel") go("words");
     else if (act === "export-json") exportJson();
     else if (act === "export-csv") exportCsv();
     else if (act === "copy-export") copyExport();
@@ -1129,32 +1041,8 @@
     else if (act === "sync-login") {
       if (window.VocabSync) {
         var ok = await window.VocabSync.login();
-        if (ok) {
-          toast(t("syncLoginSuccess"));
-          renderTools();
-          backgroundSync();
-        } else {
-          toast(t("syncLoginFail"));
-        }
-      }
-    }
-    else if (act === "sync-now") {
-      if (window.VocabSync) {
-        var local2 = await collectLocalData();
-        var res = await window.VocabSync.fullSync(local2);
-        if (res.error) toast(t("syncStatusError"));
-        else {
-          await applyPulledData(res);
-          toast(t("syncSuccess", { p: res.pushed.words, g: (res.words || []).length }));
-          renderTools();
-        }
-      }
-    }
-    else if (act === "sync-logout") {
-      if (await confirmDialog(t("syncLogoutConfirm"))) {
-        window.VocabSync.logout();
-        toast(t("syncLoggedOut"));
-        renderTools();
+        if (ok) { toast(t("syncLoginSuccess")); renderTools(); }
+        else toast(t("syncLoginFail"));
       }
     }
   });
@@ -1183,9 +1071,7 @@
       updateLangChip();
       render();
     }
-    if (e.target.closest("#sync-chip")) {
-      go("tools");
-    }
+    if (e.target.closest("#sync-chip")) { go("tools"); }
   });
 
   async function init() {
@@ -1200,26 +1086,30 @@
       (allReviews || []).forEach(function (r) { if (r && r.wordId) reviews[r.wordId] = r; });
       lastBackup = (await metaGet("lastBackup")) || 0;
 
-      if (!words.length && (await metaGet("nextNo")) === undefined) {
-        await metaSet("nextNo", 1);
-      } else {
-        await fixNextNo();
-      }
+      if (!words.length && (await metaGet("nextNo")) === undefined) await metaSet("nextNo", 1);
+      else await fixNextNo();
 
-      if (navigator.storage && navigator.storage.persist) {
-        navigator.storage.persist().catch(function () {});
-      }
+      if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(function () {});
 
       updateLangChip();
       go("words");
 
-      // Auto-init sync if VocabSync available
       if (window.VocabSync) {
-        window.VocabSync.subscribe(function () { renderSyncChip(); });
-        var loggedIn = await window.VocabSync.init();
-        if (loggedIn) backgroundSync();
+        window.VocabSync.subscribe(function () {
+          var chip = $("sync-chip");
+          if (!chip) return;
+          var st = window.VocabSync.getState();
+          var cls = "sync-chip";
+          var lbl = "☁";
+          if (st.status === "ok") cls += " ok";
+          else if (st.status === "syncing") { cls += " syncing"; lbl = "↻"; }
+          else if (st.status === "error") { cls += " error"; lbl = "⚠"; }
+          else if (st.status === "idle") cls += " idle";
+          chip.className = cls;
+          chip.textContent = lbl;
+        });
+        window.VocabSync.init();
       }
-
     } catch (err) {
       console.error(err);
       $("app").innerHTML = '<section class="view"><div class="empty"><p class="title">Storage error</p><p>IndexedDB is not available in this browser.</p></div></section>';
