@@ -21,6 +21,7 @@
   var timerHandle = null;
   var idleHandle = null;
   var showDetails = false;
+  var hintVisible = false;
 
   var IDLE_MS = 2 * 60 * 1000;
 
@@ -79,6 +80,7 @@
     h += '<div class="setup-options">';
     h += '<button type="button" class="opt-btn' + (setup.mode === "bn_en" ? " on" : "") + '" data-set="mode" data-val="bn_en">' + t("mode_bn_en") + '</button>';
     h += '<button type="button" class="opt-btn' + (setup.mode === "en_bn" ? " on" : "") + '" data-set="mode" data-val="en_bn">' + t("mode_en_bn") + '</button>';
+    h += '<button type="button" class="opt-btn' + (setup.mode === "fill" ? " on" : "") + '" data-set="mode" data-val="fill">' + t("mode_fill") + '</button>';
     h += '</div>';
     h += '</div>';
 
@@ -156,18 +158,26 @@
     }
   }
 
-  function startSession(customQuestions) {
+  async function startSession(customQuestions) {
     var pool;
     if (customQuestions && customQuestions.length) pool = customQuestions;
     else pool = getSourceWords();
     if (pool.length < 1) { toast(t("notEnoughWords")); return; }
 
     var picked = customQuestions ? pool.slice() : pool.slice().sort(function () { return Math.random() - 0.5; }).slice(0, Math.min(setup.count, pool.length));
+
+    // For fill mode: batch-fetch sentences first
+    var sentences = null;
+    if (setup.mode === "fill") {
+      sentences = await fetchBatchSentences(picked);
+    }
+
     var now = Date.now();
 
     session = {
       mode: setup.mode,
       questions: picked,
+      sentences: sentences || {},   // { wordId: {sentence, blanked} }
       current: 0,
       answers: [],
       answered: false,
@@ -181,8 +191,40 @@
     };
 
     showDetails = false;
+    hintVisible = false;
     startTimer();
     renderQuestion();
+  }
+
+  async function fetchBatchSentences(words) {
+    if (!window.VocabAI || !window.VocabAI.batchSentences) return {};
+    // Show loading screen
+    M.getAppEl().innerHTML = '<section class="view"><div class="empty"><div class="skeleton" style="height:80px;margin-bottom:10px"></div><div class="skeleton" style="height:80px;margin-bottom:10px"></div><p class="title" style="margin-top:20px">' + t("aiGeneratingSentences") + '</p><p>' + t("aiPleaseWait") + '</p></div></section>';
+    M.setTitle(t("practice"));
+
+    var result = await window.VocabAI.batchSentences(words);
+    var map = {};
+    if (result.ok && result.data && Array.isArray(result.data.sentences)) {
+      result.data.sentences.forEach(function (s, idx) {
+        var w = words[parseInt(s.id, 10) - 1] || words[idx];
+        if (!w) return;
+        map[w.id] = {
+          sentence: s.sentence || "",
+          blanked: s.blanked || s.sentence || ""
+        };
+      });
+    }
+    // Fallback for missing
+    words.forEach(function (w) {
+      if (!map[w.id]) {
+        map[w.id] = {
+          sentence: "The word \"___\" means " + (w.bn || []).join(", ") + ".",
+          blanked: "The word \"_____\" means " + (w.bn || []).join(", ") + ".",
+          isFallback: true
+        };
+      }
+    });
+    return map;
   }
 
   function startTimer() {
@@ -243,7 +285,11 @@
   function checkAnswer(word, userInput) {
     var user = normalize(userInput);
     if (!user) return false;
-    if (session.mode === "bn_en") return normalize(word.en) === user;
+
+    if (session.mode === "bn_en" || session.mode === "fill") {
+      return normalize(word.en) === user;
+    }
+    // en_bn mode
     var userParts = user.split(/[,;،]+/).map(function (s) { return s.trim(); }).filter(Boolean);
     for (var i = 0; i < userParts.length; i++) {
       var up = userParts[i];
@@ -257,15 +303,22 @@
   }
 
   function getCorrectAnswerText(word) {
-    if (session.mode === "bn_en") return word.en;
-    return word.bn.join(", ");
+    if (session.mode === "en_bn") return word.bn.join(", ");
+    return word.en;
   }
   function getQuestionText(word) {
     if (session.mode === "bn_en") return word.bn.join(", ");
-    return word.en;
+    if (session.mode === "en_bn") return word.en;
+    // fill mode — show blanked sentence
+    var s = session.sentences[word.id];
+    if (s && s.blanked) return s.blanked;
+    return "The word \"_____\" means " + (word.bn || []).join(", ") + ".";
   }
+
   function getQuestionLabel() {
-    return session.mode === "bn_en" ? "বাংলা" : "English";
+    if (session.mode === "bn_en") return "বাংলা";
+    if (session.mode === "en_bn") return "English";
+    return t("fillInBlank");
   }
 
   function renderQuestion() {
@@ -275,6 +328,7 @@
     var total = session.questions.length;
     var n = session.current + 1;
     var pct = ((session.current) / total) * 100;
+    var isFill = session.mode === "fill";
 
     var h = '<section class="view practice-session">';
     h += '<div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%"></div></div>';
@@ -291,8 +345,21 @@
 
     h += '<div class="question-card">';
     h += '<div class="question-prompt">' + esc(getQuestionLabel()) + '</div>';
-    h += '<div class="question-text' + (session.mode === "bn_en" ? " bengali" : "") + '">' + esc(getQuestionText(word)) + '</div>';
+    if (isFill) {
+      h += '<div class="question-text" style="font-size:1.15rem;font-weight:500;line-height:1.5">' + esc(getQuestionText(word)) + '</div>';
+    } else {
+      h += '<div class="question-text' + (session.mode === "bn_en" ? " bengali" : "") + '">' + esc(getQuestionText(word)) + '</div>';
+    }
     h += '</div>';
+
+    // Hint (fill mode only)
+    if (isFill && !session.answered) {
+      if (hintVisible) {
+        h += '<div class="feedback" style="background:var(--accent-soft);color:var(--accent);border:1px solid rgba(13,148,136,0.25);text-align:center">💡 ' + t("hint") + ': <b>' + esc((word.bn || []).join(", ")) + '</b></div>';
+      } else {
+        h += '<div style="text-align:center"><button type="button" data-act="show-hint" style="background:transparent;border:1.5px dashed var(--border);color:var(--text-muted);border-radius:10px;padding:8px 16px;font:inherit;font-size:0.85rem;font-weight:600;cursor:pointer">💡 ' + t("showHint") + '</button></div>';
+      }
+    }
 
     h += '<div class="answer-area">';
     var inputClass = "answer-input";
@@ -353,6 +420,7 @@
   function doNext() {
     session.answered = false;
     session.userAnswer = "";
+    hintVisible = false;
     session.current++;
     session.questionStartAt = Date.now();
     if (session.current >= session.questions.length) finishSession();
@@ -368,7 +436,6 @@
     var totalMs = session.elapsedMs;
     var avgMs = Math.round(totalMs / total);
 
-    // Save session
     try {
       var se = {
         id: uid(),
@@ -385,11 +452,9 @@
       if (M.sessions && Array.isArray(M.sessions)) M.sessions.unshift(se);
     } catch (e) { console.error(e); }
 
-    // Update review state per word
     try {
       for (var i = 0; i < session.answers.length; i++) {
-        var a = session.answers[i];
-        await M.updateReviewAfterAnswer(a.id, a.correct);
+        await M.updateReviewAfterAnswer(session.answers[i].id, session.answers[i].correct);
       }
     } catch (e) { console.error(e); }
 
@@ -480,6 +545,7 @@
     stopTimer();
     session = null;
     showDetails = false;
+    hintVisible = false;
     renderSetup();
   }
 
@@ -516,6 +582,7 @@
       return true;
     }
     if (a === "practice-resume") { doResume(); return true; }
+    if (a === "show-hint") { hintVisible = true; renderQuestion(); return true; }
     if (a === "toggle-details") {
       showDetails = !showDetails;
       if (session) {
@@ -526,16 +593,16 @@
       }
       return true;
     }
-    if (a === "practice-again") { stopTimer(); session = null; showDetails = false; renderSetup(); return true; }
+    if (a === "practice-again") { stopTimer(); session = null; showDetails = false; hintVisible = false; renderSetup(); return true; }
     if (a === "practice-wrong") {
       var wrongIds = session.answers.filter(function (x) { return !x.correct; }).map(function (x) { return x.id; });
       var wrongWords = M.words.filter(function (w) { return wrongIds.indexOf(w.id) > -1; });
-      stopTimer(); session = null; showDetails = false;
+      stopTimer(); session = null; showDetails = false; hintVisible = false;
       if (wrongWords.length) startSession(wrongWords);
       return true;
     }
     if (a === "practice-done") {
-      stopTimer(); session = null; showDetails = false;
+      stopTimer(); session = null; showDetails = false; hintVisible = false;
       var navWords = document.querySelector('[data-nav="words"]');
       if (navWords) navWords.click();
       return true;
