@@ -116,14 +116,6 @@
       syncNothing: "Already up to date",
       syncLogoutConfirm: "Log out from cloud sync?",
       syncLoggedOut: "Logged out",
-      askAI: "Ask AI",
-      askAILoading: "Asking AI…",
-      askAISuccess: "AI filled the fields",
-      askAIFail: "AI could not respond",
-      aiNeedWord: "Enter the English word first",
-      aiNeedLogin: "Log in to cloud sync first",
-      aiQuotaExceeded: "AI daily limit reached",
-      aiUsedToday: "AI used today: {n}/{max}",
       fillInBlank: "Fill in the blank",
       hint: "Hint",
       showHint: "Show hint",
@@ -132,7 +124,15 @@
       explainWithAI: "Explain with AI",
       aiExplanation: "AI explanation",
       aiThinking: "Thinking…",
-      aiFail: "AI could not respond"
+      aiFail: "AI could not respond",
+      askAI: "Ask AI",
+      askAILoading: "Asking AI…",
+      askAISuccess: "AI filled the fields",
+      askAIFail: "AI could not respond",
+      aiNeedWord: "Enter the English word first",
+      aiNeedLogin: "Log in to cloud sync first",
+      aiQuotaExceeded: "AI daily limit reached",
+      aiUsedToday: "AI used today: {n}/{max}"
     },
     bn: {
       words: "শব্দ", trash: "ট্র্যাশ", tools: "টুলস", practice: "প্র্যাকটিস", stats: "স্ট্যাটস",
@@ -233,14 +233,6 @@
       syncNothing: "আগে থেকেই আপ-টু-ডেট",
       syncLogoutConfirm: "ক্লাউড সিঙ্ক থেকে লগআউট?",
       syncLoggedOut: "লগআউট হয়েছে",
-      askAI: "AI দিয়ে পূরণ",
-      askAILoading: "AI জিজ্ঞেস করছি…",
-      askAISuccess: "AI ফিল্ড পূরণ করেছে",
-      askAIFail: "AI উত্তর দিতে পারল না",
-      aiNeedWord: "প্রথমে ইংরেজি শব্দ লিখুন",
-      aiNeedLogin: "প্রথমে ক্লাউড সিঙ্কে লগইন করুন",
-      aiQuotaExceeded: "আজকের AI সীমা শেষ",
-      aiUsedToday: "আজ AI ব্যবহার: {n}/{max}",
       fillInBlank: "ফাঁকা পূরণ করুন",
       hint: "ইঙ্গিত",
       showHint: "ইঙ্গিত দেখুন",
@@ -249,7 +241,15 @@
       explainWithAI: "AI ব্যাখ্যা করুন",
       aiExplanation: "AI-এর ব্যাখ্যা",
       aiThinking: "ভাবছি…",
-      aiFail: "AI উত্তর দিতে পারল না"
+      aiFail: "AI উত্তর দিতে পারল না",
+      askAI: "AI দিয়ে পূরণ",
+      askAILoading: "AI জিজ্ঞেস করছি…",
+      askAISuccess: "AI ফিল্ড পূরণ করেছে",
+      askAIFail: "AI উত্তর দিতে পারল না",
+      aiNeedWord: "প্রথমে ইংরেজি শব্দ লিখুন",
+      aiNeedLogin: "প্রথমে ক্লাউড সিঙ্কে লগইন করুন",
+      aiQuotaExceeded: "আজকের AI সীমা শেষ",
+      aiUsedToday: "আজ AI ব্যবহার: {n}/{max}"
     }
   };
 
