@@ -1,6 +1,6 @@
 /* ============================================================
    Vocabulary Mini App — ai.js
-   Phase 6: AI client (via Supabase Edge Function proxy)
+   Phase 6b: batch sentences + fill in the blanks
    ============================================================ */
 
 (function () {
@@ -57,7 +57,6 @@
         state.lastError = msg;
         state.loading = false;
         emit();
-
         if (res.status === 429) {
           return { ok: false, error: "quota_exceeded", message: msg, used: data.used, limit: data.limit };
         }
@@ -68,7 +67,6 @@
       state.lastLimit = data.limit || 100;
       state.loading = false;
       emit();
-
       return { ok: true, data: data.data || {}, used: state.lastUsage, limit: state.lastLimit };
 
     } catch (e) {
@@ -77,6 +75,15 @@
       emit();
       return { ok: false, error: "network", message: state.lastError };
     }
+  }
+
+  /** Batch: generate one sentence per word (single Edge Function call) */
+  function batchSentences(words) {
+    return call("batch-sentences", {
+      words: (words || []).map(function (w) {
+        return { id: w.id, en: w.en, bn: (w.bn || []).join(", ") };
+      })
+    });
   }
 
   window.VocabAI = {
@@ -89,6 +96,8 @@
     makeSentence: function (en, bn) {
       return call("sentence", { en: en, bn: bn });
     },
+
+    batchSentences: batchSentences,
 
     getFeedback: function (en, correct, userAnswer, question) {
       return call("feedback", { en: en, correct: correct, userAnswer: userAnswer, question: question });
