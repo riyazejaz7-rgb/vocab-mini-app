@@ -79,21 +79,17 @@
     }
   }
 
-  /* ---------- Public API ---------- */
   window.VocabAI = {
     getState: function () { return state; },
 
-    /** Fill word details from a single English word */
     fillWord: function (en) {
       return call("word", { en: en });
     },
 
-    /** Get a natural example sentence + blanked version for practice */
     makeSentence: function (en, bn) {
       return call("sentence", { en: en, bn: bn });
     },
 
-    /** Friendly Bengali feedback when student is wrong */
     getFeedback: function (en, correct, userAnswer, question) {
       return call("feedback", { en: en, correct: correct, userAnswer: userAnswer, question: question });
     }
