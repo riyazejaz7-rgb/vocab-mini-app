@@ -42,7 +42,8 @@
       dup: "This word is already saved as #{no}.",
       dupTrash: "This word is in Trash (#{no}). Restore it from there.",
       total: "Total", today: "Today",
-      exportTitle: "Backup & export", exportDesc: "Save a copy of your words. Keep it safe.",
+      exportTitle: "Backup & export",
+      exportDesc: "Save a copy of your words. Keep it safe.",
       backupJson: "Backup (JSON)", exportCsv: "Export (CSV)",
       copy: "Copy", download: "Download", copied: "Copied",
       importTitle: "Import & restore",
@@ -55,7 +56,8 @@
       badInput: "Could not read that input",
       backupNever: "You haven't backed up yet",
       backupNeverSub: "Export now to protect your words.",
-      backupOld: "Last backup: {n} days ago", backupToday: "Last backup: today",
+      backupOld: "Last backup: {n} days ago",
+      backupToday: "Last backup: today",
       backupNow: "Backup now",
       confirmReplace1: "Replace ALL words with this backup?",
       confirmReplace2: "Are you sure? This cannot be undone.",
@@ -64,19 +66,24 @@
       pos_preposition: "preposition", pos_conjunction: "conjunction",
       pos_pronoun: "pronoun", pos_interjection: "interjection", pos_other: "other",
       practice: "Practice", practiceSetup: "Practice setup",
-      mode: "Mode", mode_bn_en: "বাংলা → English", mode_en_bn: "English → বাংলা", mode_fill: "Fill in the blank",
-      questionCount: "Number of questions", wordSource: "Which words",
+      mode: "Mode",
+      mode_bn_en: "বাংলা → English", mode_en_bn: "English → বাংলা", mode_fill: "Fill blanks",
+      questionCount: "Number of questions",
+      wordSource: "Which words",
       source_all: "All words", source_new: "New words", source_wrong: "Wrong words",
       source_range: "Range", source_due: "Due today",
-      rangeLabel: "Pick a range", rangeFrom: "From", rangeTo: "To", rangeWordsFound: "words found",
+      rangeLabel: "Pick a range", rangeFrom: "From", rangeTo: "To",
+      rangeWordsFound: "words found",
       startPractice: "Start practice",
       check: "Check", next: "Next", finish: "Finish",
       correctLabel: "Correct!", wrongLabel: "Wrong",
-      correctAnswerWas: "Correct answer:", typeYourAnswer: "Type your answer…",
+      correctAnswerWas: "Correct answer:",
+      typeYourAnswer: "Type your answer…",
       questionOf: "Question {n} of {total}",
       resultGreat: "Excellent!", resultGood: "Good job!", resultOk: "Keep practicing",
       youGot: "You got {c} out of {t} correct",
-      accuracy: "Accuracy", tryAgain: "Try again", done: "Done",
+      accuracy: "Accuracy",
+      tryAgain: "Try again", done: "Done",
       notEnoughWords: "Need at least 4 words to practice",
       practiceNoWords: "Add at least 4 words to start practicing.",
       practiceNoWordsSub: "Tap + on the Words tab.",
@@ -88,51 +95,42 @@
       viewDetails: "View details", hideDetails: "Hide details",
       practiceWrong: "Practice wrong",
       youWrote: "You wrote:", correctAnswer: "Correct answer:",
-      historyTitle: "Practice history", historyDesc: "Your past practice sessions.",
-      historyEmpty: "No sessions yet", historyEmptySub: "Complete a practice session to see it here.",
+      historyTitle: "Practice history",
+      historyDesc: "Your past practice sessions.",
+      historyEmpty: "No sessions yet",
+      historyEmptySub: "Complete a practice session to see it here.",
       historyToday: "Today", historyYesterday: "Yesterday",
-      historySession: "Session", historyMode: "Mode", historyScore: "Score", historyTime: "Time",
-      historyClear: "Clear history", historyClearConfirm: "Delete all practice history?",
+      historySession: "Session", historyMode: "Mode",
+      historyScore: "Score", historyTime: "Time",
+      historyClear: "Clear history",
+      historyClearConfirm: "Delete all practice history?",
       historyCleared: "History cleared",
       filterAll: "All", filterToday: "Today", filter7d: "7 days", filter30d: "30 days",
-      deleteSession: "Delete this session?", sessionDeleted: "Session deleted",
-      statsTitle: "Stats", statsTodayPracticed: "Today", statsWeekPracticed: "7 days",
-      statsTotalWords: "Words", statsMastered: "Mastered", statsStreak: "Streak", statsDays: "days",
-      statsDueToday: "Due today", statsDueTodayDesc: "Review these words today",
-      statsDueNothing: "Nothing due today — great work!", statsStartReview: "Start review",
-      statsWeeklyChart: "Last 7 days", statsMasteredList: "Mastered words",
+      deleteSession: "Delete this session?",
+      sessionDeleted: "Session deleted",
+      statsTitle: "Stats",
+      statsTodayPracticed: "Today",
+      statsWeekPracticed: "7 days",
+      statsTotalWords: "Words",
+      statsMastered: "Mastered",
+      statsStreak: "Streak",
+      statsDays: "days",
+      statsDueToday: "Due today",
+      statsDueTodayDesc: "Review these words today",
+      statsDueNothing: "Nothing due today — great work!",
+      statsStartReview: "Start review",
+      statsWeeklyChart: "Last 7 days",
+      statsMasteredList: "Mastered words",
       statsMasteredEmpty: "No mastered words yet. Keep practicing!",
-      statsReviewSchedule: "Review schedule", statsBox: "Box {n}",
-      statsNextReview: "Next: {d} days", statsReviewNow: "Review now",
-      statsLevel1: "Learning", statsLevel2: "Almost", statsLevel3: "Good",
-      statsLevel4: "Strong", statsLevel5: "Mastered",
-      syncTitle: "Cloud sync", syncDesc: "Sync your words to the cloud.",
-      syncLogin: "Log in with Telegram", syncLogout: "Log out", syncNow: "Sync now",
-      syncStatusIdle: "Not logged in", syncStatusSyncing: "Syncing…",
-      syncStatusOk: "Synced", syncStatusError: "Sync error", syncStatusOffline: "Offline",
-      syncLastAt: "Last sync: {t}", syncNever: "Never synced",
-      syncLoginSuccess: "Logged in", syncLoginFail: "Login failed",
-      syncSuccess: "Synced: +{p} words, ↓{g} words",
-      syncNothing: "Already up to date",
-      syncLogoutConfirm: "Log out from cloud sync?",
-      syncLoggedOut: "Logged out",
-      askAI: "Ask AI",
-      askAILoading: "Asking AI…",
-      askAISuccess: "AI filled the fields",
-      askAIFail: "AI could not respond",
-      aiNeedWord: "Enter the English word first",
-      aiNeedLogin: "Log in to cloud sync first",
-      aiQuotaExceeded: "AI daily limit reached",
-      aiUsedToday: "AI used today: {n}/{max}",
-      fillInBlank: "Fill in the blank",
-      hint: "Hint",
-      showHint: "Show hint",
-      aiGeneratingSentences: "Generating sentences…",
-      aiPleaseWait: "Please wait a few seconds",
-      explainWithAI: "Explain with AI",
-      aiExplanation: "AI explanation",
-      aiThinking: "Thinking…",
-      aiFail: "AI could not respond"
+      statsReviewSchedule: "Review schedule",
+      statsBox: "Box {n}",
+      statsNextReview: "Next: {d} days",
+      statsReviewNow: "Review now",
+      statsLevel1: "Learning",
+      statsLevel2: "Almost",
+      statsLevel3: "Good",
+      statsLevel4: "Strong",
+      statsLevel5: "Mastered"
     },
     bn: {
       words: "শব্দ", trash: "ট্র্যাশ", tools: "টুলস", practice: "প্র্যাকটিস", stats: "স্ট্যাটস",
@@ -155,11 +153,13 @@
       confirmEmptyTrash: "ট্র্যাশের সব শব্দ চিরতরে মুছবেন?",
       saved: "সংরক্ষিত", restored: "ফিরিয়ে আনা হয়েছে", deleted: "ট্র্যাশে পাঠানো হয়েছে",
       permDeleted: "চিরতরে মুছে ফেলা হয়েছে", trashEmptied: "ট্র্যাশ খালি করা হয়েছে",
-      needEn: "ইংরেজি শব্দ লিখুন", needBn: "অন্তত একটি বাংলা অর্থ লিখুন",
+      needEn: "ইংরেজি শব্দ লিখুন",
+      needBn: "অন্তত একটি বাংলা অর্থ লিখুন",
       dup: "এই শব্দ আগেই সংরক্ষিত আছে #{no} হিসেবে।",
       dupTrash: "এই শব্দ ট্র্যাশে আছে (#{no})। সেখান থেকে ফিরিয়ে আনুন।",
       total: "মোট", today: "আজ",
-      exportTitle: "ব্যাকআপ ও এক্সপোর্ট", exportDesc: "আপনার শব্দের একটি কপি সংরক্ষণ করুন।",
+      exportTitle: "ব্যাকআপ ও এক্সপোর্ট",
+      exportDesc: "আপনার শব্দের একটি কপি সংরক্ষণ করুন।",
       backupJson: "ব্যাকআপ (JSON)", exportCsv: "এক্সপোর্ট (CSV)",
       copy: "কপি", download: "ডাউনলোড", copied: "কপি হয়েছে",
       importTitle: "ইমপোর্ট ও রিস্টোর",
@@ -172,7 +172,8 @@
       badInput: "ইনপুট পড়া যায়নি",
       backupNever: "এখনো ব্যাকআপ নেননি",
       backupNeverSub: "শব্দ রক্ষা করতে এখনই এক্সপোর্ট করুন।",
-      backupOld: "শেষ ব্যাকআপ: {n} দিন আগে", backupToday: "শেষ ব্যাকআপ: আজ",
+      backupOld: "শেষ ব্যাকআপ: {n} দিন আগে",
+      backupToday: "শেষ ব্যাকআপ: আজ",
       backupNow: "ব্যাকআপ নিন",
       confirmReplace1: "সব শব্দ এই ব্যাকআপ দিয়ে বদলাবেন?",
       confirmReplace2: "নিশ্চিত? এটি ফেরানো যাবে না।",
@@ -181,19 +182,24 @@
       pos_preposition: "পূর্বসর্গ", pos_conjunction: "সংযোজক",
       pos_pronoun: "সর্বনাম", pos_interjection: "আবেগসূচক", pos_other: "অন্যান্য",
       practice: "প্র্যাকটিস", practiceSetup: "প্র্যাকটিস সেটআপ",
-      mode: "মোড", mode_bn_en: "বাংলা → English", mode_en_bn: "English → বাংলা", mode_fill: "ফাঁকা পূরণ",
-      questionCount: "প্রশ্ন সংখ্যা", wordSource: "কোন শব্দ",
+      mode: "মোড",
+      mode_bn_en: "বাংলা → English", mode_en_bn: "English → বাংলা", mode_fill: "ফাঁকা পূরণ",
+      questionCount: "প্রশ্ন সংখ্যা",
+      wordSource: "কোন শব্দ",
       source_all: "সব শব্দ", source_new: "নতুন শব্দ", source_wrong: "ভুল শব্দ",
       source_range: "রেঞ্জ", source_due: "আজকের রিভিউ",
-      rangeLabel: "রেঞ্জ বেছে নিন", rangeFrom: "থেকে", rangeTo: "পর্যন্ত", rangeWordsFound: "শব্দ পাওয়া গেছে",
+      rangeLabel: "রেঞ্জ বেছে নিন", rangeFrom: "থেকে", rangeTo: "পর্যন্ত",
+      rangeWordsFound: "শব্দ পাওয়া গেছে",
       startPractice: "প্র্যাকটিস শুরু",
       check: "যাচাই", next: "পরবর্তী", finish: "শেষ",
       correctLabel: "সঠিক!", wrongLabel: "সঠিক হয়নি",
-      correctAnswerWas: "সঠিক উত্তর:", typeYourAnswer: "উত্তর লিখুন…",
+      correctAnswerWas: "সঠিক উত্তর:",
+      typeYourAnswer: "উত্তর লিখুন…",
       questionOf: "প্রশ্ন {n} / {total}",
       resultGreat: "অসাধারণ!", resultGood: "ভালো করেছ!", resultOk: "আরো প্র্যাকটিস কর",
       youGot: "{t}টির মধ্যে {c}টি সঠিক",
-      accuracy: "নির্ভুলতা", tryAgain: "আবার চেষ্টা", done: "সম্পন্ন",
+      accuracy: "নির্ভুলতা",
+      tryAgain: "আবার চেষ্টা", done: "সম্পন্ন",
       notEnoughWords: "প্র্যাকটিসের জন্য অন্তত ৪টি শব্দ দরকার",
       practiceNoWords: "অন্তত ৪টি শব্দ যোগ করুন প্র্যাকটিস শুরু করতে।",
       practiceNoWordsSub: "শব্দ ট্যাবে + চাপুন।",
@@ -205,51 +211,42 @@
       viewDetails: "বিস্তারিত দেখুন", hideDetails: "বিস্তারিত লুকান",
       practiceWrong: "ভুলগুলো প্র্যাকটিস",
       youWrote: "আপনি লিখেছেন:", correctAnswer: "সঠিক উত্তর:",
-      historyTitle: "প্র্যাকটিস হিস্ট্রি", historyDesc: "আপনার আগের প্র্যাকটিস সেশন।",
-      historyEmpty: "এখনো কোনো সেশন নেই", historyEmptySub: "একটি প্র্যাকটিস সেশন সম্পন্ন করলে এখানে দেখা যাবে।",
+      historyTitle: "প্র্যাকটিস হিস্ট্রি",
+      historyDesc: "আপনার আগের প্র্যাকটিস সেশন।",
+      historyEmpty: "এখনো কোনো সেশন নেই",
+      historyEmptySub: "একটি প্র্যাকটিস সেশন সম্পন্ন করলে এখানে দেখা যাবে।",
       historyToday: "আজ", historyYesterday: "গতকাল",
-      historySession: "সেশন", historyMode: "মোড", historyScore: "স্কোর", historyTime: "সময়",
-      historyClear: "হিস্ট্রি মুছুন", historyClearConfirm: "সব প্র্যাকটিস হিস্ট্রি মুছবেন?",
+      historySession: "সেশন", historyMode: "মোড",
+      historyScore: "স্কোর", historyTime: "সময়",
+      historyClear: "হিস্ট্রি মুছুন",
+      historyClearConfirm: "সব প্র্যাকটিস হিস্ট্রি মুছবেন?",
       historyCleared: "হিস্ট্রি মুছে ফেলা হয়েছে",
       filterAll: "সব", filterToday: "আজ", filter7d: "৭ দিন", filter30d: "৩০ দিন",
-      deleteSession: "এই সেশনটি মুছবেন?", sessionDeleted: "সেশন মুছে ফেলা হয়েছে",
-      statsTitle: "স্ট্যাটস", statsTodayPracticed: "আজ", statsWeekPracticed: "৭ দিন",
-      statsTotalWords: "শব্দ", statsMastered: "মাস্টারড", statsStreak: "স্ট্রিক", statsDays: "দিন",
-      statsDueToday: "আজকের রিভিউ", statsDueTodayDesc: "আজ এই শব্দগুলো রিভিউ করুন",
-      statsDueNothing: "আজ কোনো রিভিউ নেই — দারুণ!", statsStartReview: "রিভিউ শুরু",
-      statsWeeklyChart: "শেষ ৭ দিন", statsMasteredList: "মাস্টারড শব্দ",
+      deleteSession: "এই সেশনটি মুছবেন?",
+      sessionDeleted: "সেশন মুছে ফেলা হয়েছে",
+      statsTitle: "স্ট্যাটস",
+      statsTodayPracticed: "আজ",
+      statsWeekPracticed: "৭ দিন",
+      statsTotalWords: "শব্দ",
+      statsMastered: "মাস্টারড",
+      statsStreak: "স্ট্রিক",
+      statsDays: "দিন",
+      statsDueToday: "আজকের রিভিউ",
+      statsDueTodayDesc: "আজ এই শব্দগুলো রিভিউ করুন",
+      statsDueNothing: "আজ কোনো রিভিউ নেই — দারুণ!",
+      statsStartReview: "রিভিউ শুরু",
+      statsWeeklyChart: "শেষ ৭ দিন",
+      statsMasteredList: "মাস্টারড শব্দ",
       statsMasteredEmpty: "এখনো কোনো মাস্টারড শব্দ নেই। চালিয়ে যান!",
-      statsReviewSchedule: "রিভিউ শিডিউল", statsBox: "বক্স {n}",
-      statsNextReview: "পরবর্তী: {d} দিন", statsReviewNow: "এখনই রিভিউ",
-      statsLevel1: "শিখছি", statsLevel2: "প্রায়", statsLevel3: "ভালো",
-      statsLevel4: "শক্ত", statsLevel5: "মাস্টারড",
-      syncTitle: "ক্লাউড সিঙ্ক", syncDesc: "আপনার শব্দ ক্লাউডে সিঙ্ক করুন।",
-      syncLogin: "Telegram দিয়ে লগইন", syncLogout: "লগআউট", syncNow: "এখনই সিঙ্ক",
-      syncStatusIdle: "লগইন নেই", syncStatusSyncing: "সিঙ্ক চলছে…",
-      syncStatusOk: "সিঙ্ক হয়েছে", syncStatusError: "সিঙ্ক সমস্যা", syncStatusOffline: "অফলাইন",
-      syncLastAt: "শেষ সিঙ্ক: {t}", syncNever: "এখনো সিঙ্ক হয়নি",
-      syncLoginSuccess: "লগইন হয়েছে", syncLoginFail: "লগইন হয়নি",
-      syncSuccess: "সিঙ্ক: +{p} শব্দ, ↓{g} শব্দ",
-      syncNothing: "আগে থেকেই আপ-টু-ডেট",
-      syncLogoutConfirm: "ক্লাউড সিঙ্ক থেকে লগআউট?",
-      syncLoggedOut: "লগআউট হয়েছে",
-      askAI: "AI দিয়ে পূরণ",
-      askAILoading: "AI জিজ্ঞেস করছি…",
-      askAISuccess: "AI ফিল্ড পূরণ করেছে",
-      askAIFail: "AI উত্তর দিতে পারল না",
-      aiNeedWord: "প্রথমে ইংরেজি শব্দ লিখুন",
-      aiNeedLogin: "প্রথমে ক্লাউড সিঙ্কে লগইন করুন",
-      aiQuotaExceeded: "আজকের AI সীমা শেষ",
-      aiUsedToday: "আজ AI ব্যবহার: {n}/{max}",
-      fillInBlank: "ফাঁকা পূরণ করুন",
-      hint: "ইঙ্গিত",
-      showHint: "ইঙ্গিত দেখুন",
-      aiGeneratingSentences: "বাক্য তৈরি হচ্ছে…",
-      aiPleaseWait: "একটু অপেক্ষা করুন",
-      explainWithAI: "AI ব্যাখ্যা করুন",
-      aiExplanation: "AI-এর ব্যাখ্যা",
-      aiThinking: "ভাবছি…",
-      aiFail: "AI উত্তর দিতে পারল না"
+      statsReviewSchedule: "রিভিউ শিডিউল",
+      statsBox: "বক্স {n}",
+      statsNextReview: "পরবর্তী: {d} দিন",
+      statsReviewNow: "এখনই রিভিউ",
+      statsLevel1: "শিখছি",
+      statsLevel2: "প্রায়",
+      statsLevel3: "ভালো",
+      statsLevel4: "শক্ত",
+      statsLevel5: "মাস্টারড"
     }
   };
 
@@ -279,13 +276,19 @@
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
   }
-  function norm(s) { return String(s || "").trim().toLowerCase().replace(/\s+/g, " "); }
-  function splitList(s) { return String(s || "").split(/[,;،]+/).map(function (x) { return x.trim(); }).filter(Boolean); }
+  function norm(s) {
+    return String(s || "").trim().toLowerCase().replace(/\s+/g, " ");
+  }
+  function splitList(s) {
+    return String(s || "").split(/[,;،]+/).map(function (x) { return x.trim(); }).filter(Boolean);
+  }
   function uid() {
     return (window.crypto && crypto.randomUUID) ? crypto.randomUUID() :
       "id-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 10);
   }
-  function daysSince(ts) { return Math.floor((Date.now() - ts) / 86400000); }
+  function daysSince(ts) {
+    return Math.floor((Date.now() - ts) / 86400000);
+  }
   function todayKey() {
     var d = new Date();
     return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
@@ -321,7 +324,7 @@
   function openDB() {
     return new Promise(function (resolve, reject) {
       var req = indexedDB.open("vocab_db", 3);
-      req.onupgradeneeded = function () {
+      req.onupgradeneeded = function (ev) {
         var d = req.result;
         if (!d.objectStoreNames.contains("words")) d.createObjectStore("words", { keyPath: "id" });
         if (!d.objectStoreNames.contains("meta")) d.createObjectStore("meta", { keyPath: "k" });
@@ -345,12 +348,12 @@
   function dbGetAllSessions() { return txStore("sessions", "readonly", function (s) { return s.getAll(); }); }
   function dbGetAllReviews() { return txStore("reviews", "readonly", function (s) { return s.getAll(); }); }
   function dbPutWord(w) { return txStore("words", "readwrite", function (s) { s.put(w); }); }
-  function dbPutWords(ws) { return txStore("words", "readwrite", function (s) { ws.forEach(function (w) { s.put(w); }); }); }
   function dbPutSession(se) { return txStore("sessions", "readwrite", function (s) { s.put(se); }); }
   function dbDeleteSession(id) { return txStore("sessions", "readwrite", function (s) { s.delete(id); }); }
   function dbClearSessions() { return txStore("sessions", "readwrite", function (s) { s.clear(); }); }
   function dbPutReview(r) { return txStore("reviews", "readwrite", function (s) { s.put(r); }); }
   function dbClearReviews() { return txStore("reviews", "readwrite", function (s) { s.clear(); }); }
+  function dbPutWords(ws) { return txStore("words", "readwrite", function (s) { ws.forEach(function (w) { s.put(w); }); }); }
   function dbDeleteWord(id) { return txStore("words", "readwrite", function (s) { s.delete(id); }); }
   function dbClearWords() { return txStore("words", "readwrite", function (s) { s.clear(); }); }
   function metaGet(k) { return txStore("meta", "readonly", function (s) { return s.get(k); }).then(function (r) { return r ? r.v : undefined; }); }
@@ -377,21 +380,34 @@
     for (var i = 0; i < words.length; i++) if (words[i].id === id) return words[i];
     return null;
   }
-  function getReview(wordId) { return reviews[wordId] || null; }
+  function getReview(wordId) {
+    return reviews[wordId] || null;
+  }
   function isDueToday(wordId) {
     var r = reviews[wordId];
     if (!r) return true;
     if (!r.nextReview) return true;
     return r.nextReview <= Date.now();
   }
-  function getDueWords() { return words.filter(function (w) { return !w.deleted && isDueToday(w.id); }); }
+  function getDueWords() {
+    return words.filter(function (w) {
+      return !w.deleted && isDueToday(w.id);
+    });
+  }
   function isMastered(wordId) {
     var r = reviews[wordId];
     if (!r) return false;
     return (r.box || 0) >= 5;
   }
   function updateReviewAfterAnswer(wordId, correct) {
-    var r = reviews[wordId] || { wordId: wordId, box: 0, lastReview: 0, nextReview: 0, correctStreak: 0, days: {} };
+    var r = reviews[wordId] || {
+      wordId: wordId,
+      box: 0,
+      lastReview: 0,
+      nextReview: 0,
+      correctStreak: 0,
+      days: {}
+    };
     var tk = todayKey();
     r.days = r.days || {};
     r.days[tk] = (r.days[tk] || 0) + (correct ? 1 : 0);
@@ -402,12 +418,15 @@
       r.box = 1;
       r.correctStreak = 0;
     }
-    var correctDays = 0, totalCorrect = 0;
+    var correctDays = 0;
+    var totalCorrect = 0;
     Object.keys(r.days).forEach(function (d) {
       if (r.days[d] > 0) correctDays++;
       totalCorrect += r.days[d];
     });
-    if (totalCorrect >= MASTERY.MIN_CORRECT && correctDays >= MASTERY.MIN_DAYS) r.box = 5;
+    if (totalCorrect >= MASTERY.MIN_CORRECT && correctDays >= MASTERY.MIN_DAYS) {
+      r.box = 5;
+    }
     r.lastReview = Date.now();
     var interval = LEITNER_DAYS[Math.max(0, Math.min(LEITNER_DAYS.length - 1, (r.box || 1) - 1))] || 1;
     r.nextReview = Date.now() + interval * 86400000;
@@ -417,7 +436,6 @@
 
   window.VocabMain = {
     get words() { return words; },
-    set words(v) { words = v; },
     get sessions() { return sessions; },
     get reviews() { return reviews; },
     get lang() { return lang; },
@@ -440,9 +458,12 @@
     LEITNER_DAYS: LEITNER_DAYS,
     MASTERY: MASTERY
   };
-  function activeWords() { return words.filter(function (w) { return !w.deleted; }); }
+  function activeWords() {
+    return words.filter(function (w) { return !w.deleted; });
+  }
   function trashWords() {
-    return words.filter(function (w) { return w.deleted; }).sort(function (a, b) { return a.deleted - b.deleted; });
+    return words.filter(function (w) { return w.deleted; })
+      .sort(function (a, b) { return a.deleted - b.deleted; });
   }
   function matches(w) {
     if (filterPos && w.pos !== filterPos) return false;
@@ -473,6 +494,7 @@
     var wrongCount = activeWords().filter(function (w) { return w.wrongCount && w.wrongCount > 0; }).length;
 
     var html = "";
+
     html += '<div class="stats">';
     html += '<div class="stat"><span class="n">' + total + '</span><span class="l">' + t("total") + '</span></div>';
     html += '<div class="stat"><span class="n">' + today + '</span><span class="l">' + t("today") + '</span></div>';
@@ -480,8 +502,11 @@
 
     if (total > 0) {
       var b = lastBackup;
-      if (!b) html += '<div class="banner warn"><span>' + t("backupNever") + ' — ' + t("backupNeverSub") + '</span><button data-act="backup-now">' + t("backupNow") + '</button></div>';
-      else if (daysSince(b) > 7) html += '<div class="banner warn"><span>' + t("backupOld", { n: daysSince(b) }) + '</span><button data-act="backup-now">' + t("backupNow") + '</button></div>';
+      if (!b) {
+        html += '<div class="banner warn"><span>' + t("backupNever") + ' — ' + t("backupNeverSub") + '</span><button data-act="backup-now">' + t("backupNow") + '</button></div>';
+      } else if (daysSince(b) > 7) {
+        html += '<div class="banner warn"><span>' + t("backupOld", { n: daysSince(b) }) + '</span><button data-act="backup-now">' + t("backupNow") + '</button></div>';
+      }
     }
 
     html += '<div class="searchbar"><input id="search" type="search" placeholder="' + esc(t("search")) + '" value="' + esc(query) + '" autocomplete="off"></div>';
@@ -564,10 +589,6 @@
     h += '<textarea id="f_ex" rows="2">' + esc(data.ex) + '</textarea>';
     h += '<label for="f_note">' + t("notes") + ' <span class="muted">(' + t("optional") + ')</span></label>';
     h += '<textarea id="f_note" rows="2">' + esc(data.note) + '</textarea>';
-    h += '<button type="button" class="btn-ai" data-act="form-askai" id="form-askai-btn">';
-    h += '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><path d="M12 3l2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5z"/></svg>';
-    h += t("askAI");
-    h += '</button>';
     h += '<div class="form-actions">';
     h += '<button type="button" data-act="form-cancel" class="btn-secondary">' + t("cancel") + '</button>';
     h += '<button type="button" data-act="form-save" class="btn-primary">' + (isEdit ? t("saveChanges") : t("save")) + '</button>';
@@ -613,28 +634,6 @@
 
   function renderTools() {
     var h = '<section class="view">';
-
-    var syncState = window.VocabSync ? window.VocabSync.getState() : { status: "idle", lastSyncAt: 0 };
-    h += '<div class="section">';
-    h += '<h2>' + t("syncTitle") + '</h2>';
-    h += '<p class="desc">' + t("syncDesc") + '</p>';
-    if (syncState.status === "idle" && !syncState.userId) {
-      h += '<div class="row"><button data-act="sync-login" class="primary">' + t("syncLogin") + '</button></div>';
-    } else {
-      var stLabel = syncState.status === "ok" ? t("syncStatusOk") :
-        syncState.status === "syncing" ? t("syncStatusSyncing") :
-        syncState.status === "error" ? (t("syncStatusError") + ": " + (syncState.errorMsg || "")) :
-        t("syncStatusIdle");
-      var lastLabel = syncState.lastSyncAt ? t("syncLastAt", { t: new Date(syncState.lastSyncAt).toLocaleString() }) : t("syncNever");
-      h += '<p style="font-size:0.88rem;color:var(--text-soft);margin:8px 0 4px"><b>' + esc(stLabel) + '</b></p>';
-      h += '<p class="desc" style="margin-top:0">' + esc(lastLabel) + '</p>';
-      h += '<div class="row">';
-      h += '<button data-act="sync-now" class="primary">' + t("syncNow") + '</button>';
-      h += '<button data-act="sync-logout">' + t("syncLogout") + '</button>';
-      h += '</div>';
-    }
-    h += '</div>';
-
     h += '<div class="section">';
     h += '<h2>' + t("historyTitle") + '</h2>';
     h += '<p class="desc">' + t("historyDesc") + '</p>';
@@ -669,7 +668,6 @@
     h += '</label>';
     h += '<div class="row"><button data-act="import-do" class="primary">' + t("importBtn") + '</button></div>';
     h += '</div>';
-
     h += '</section>';
 
     $("app").innerHTML = h;
@@ -702,40 +700,6 @@
     var c = $("lang-toggle");
     if (c) c.textContent = lang === "bn" ? "EN" : "বাং";
   }
-  async function askAI() {
-    var en = ($("f_en").value || "").trim();
-    if (!en) return toast(t("aiNeedWord"));
-    if (!window.VocabSync || !window.VocabSync.getState().userId) return toast(t("aiNeedLogin"));
-    if (!window.VocabAI) return toast(t("askAIFail"));
-
-    var btn = $("form-askai-btn");
-    if (btn) { btn.disabled = true; btn.textContent = t("askAILoading"); }
-
-    var result = await window.VocabAI.fillWord(en);
-
-    if (btn) {
-      btn.disabled = false;
-      btn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><path d="M12 3l2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5z"/></svg>' + t("askAI");
-    }
-
-    if (!result.ok) {
-      if (result.error === "quota_exceeded") return toast(t("aiQuotaExceeded"));
-      if (result.error === "not_logged_in") return toast(t("aiNeedLogin"));
-      return toast(t("askAIFail"));
-    }
-
-    var d = result.data || {};
-    if (Array.isArray(d.bn) && d.bn.length) $("f_bn").value = d.bn.join(", ");
-    if (Array.isArray(d.syn) && d.syn.length) $("f_syn").value = d.syn.join(", ");
-    if (Array.isArray(d.ant) && d.ant.length) $("f_ant").value = d.ant.join(", ");
-    if (typeof d.pos === "string" && d.pos) {
-      var posSel = $("f_pos");
-      if (posSel) posSel.value = d.pos;
-    }
-    if (typeof d.ex === "string" && d.ex) $("f_ex").value = d.ex;
-    toast(t("askAISuccess"));
-  }
-
   async function saveWord() {
     var en = ($("f_en").value || "").trim();
     var bn = splitList($("f_bn").value);
@@ -1003,7 +967,7 @@
     else if (view === "history") go("history");
   }
 
-  document.addEventListener("click", async function (e) {
+  document.addEventListener("click", function (e) {
     var nav = e.target.closest("[data-nav]");
     if (nav) return go(nav.dataset.nav);
 
@@ -1029,7 +993,6 @@
     else if (act === "del-forever") deleteForever(id);
     else if (act === "empty-trash") emptyTrash();
     else if (act === "form-save") saveWord();
-    else if (act === "form-askai") askAI();
     else if (act === "form-cancel") go("words");
     else if (act === "export-json") exportJson();
     else if (act === "export-csv") exportCsv();
@@ -1038,13 +1001,6 @@
     else if (act === "import-do") doImport();
     else if (act === "backup-now") go("tools");
     else if (act === "open-history") go("history");
-    else if (act === "sync-login") {
-      if (window.VocabSync) {
-        var ok = await window.VocabSync.login();
-        if (ok) { toast(t("syncLoginSuccess")); renderTools(); }
-        else toast(t("syncLoginFail"));
-      }
-    }
   });
 
   document.addEventListener("input", function (e) {
@@ -1085,33 +1041,19 @@
       (allReviews || []).forEach(function (r) { if (r && r.wordId) reviews[r.wordId] = r; });
       lastBackup = (await metaGet("lastBackup")) || 0;
 
-      if (!words.length && (await metaGet("nextNo")) === undefined) await metaSet("nextNo", 1);
-      else await fixNextNo();
+      if (!words.length && (await metaGet("nextNo")) === undefined) {
+        await metaSet("nextNo", 1);
+      } else {
+        await fixNextNo();
+      }
 
-      if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(function () {});
+      if (navigator.storage && navigator.storage.persist) {
+        navigator.storage.persist().catch(function () {});
+      }
 
       updateLangChip();
       go("words");
-
-      if (window.VocabSync) {
-        window.VocabSync.subscribe(function () {
-          var chip = $("sync-chip");
-          if (chip) {
-            var st = window.VocabSync.getState();
-            var cls = "sync-chip";
-            var lbl = "☁";
-            if (st.status === "ok") cls += " ok";
-            else if (st.status === "syncing") { cls += " syncing"; lbl = "↻"; }
-            else if (st.status === "error") { cls += " error"; lbl = "⚠"; }
-            else if (st.status === "idle") cls += " idle";
-            chip.className = cls;
-            chip.textContent = lbl;
-          }
-        });
-        window.VocabSync.init();
-      }
     } catch (err) {
-      console.error(err);
       $("app").innerHTML = '<section class="view"><div class="empty"><p class="title">Storage error</p><p>IndexedDB is not available in this browser.</p></div></section>';
     }
   }
