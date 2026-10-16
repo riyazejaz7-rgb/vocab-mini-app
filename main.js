@@ -120,7 +120,11 @@
       hint: "Hint",
       showHint: "Show hint",
       aiGeneratingSentences: "Generating sentences…",
-      aiPleaseWait: "Please wait a few seconds"
+      aiPleaseWait: "Please wait a few seconds" ,
+      explainWithAI: "Explain with AI",
+      aiExplanation: "AI explanation",
+      aiThinking: "Thinking…",
+      aiFail: "AI could not respond"
       askAI: "Ask AI",
       askAILoading: "Asking AI…",
       askAISuccess: "AI filled the fields",
@@ -233,7 +237,11 @@
       hint: "ইঙ্গিত",
       showHint: "ইঙ্গিত দেখুন",
       aiGeneratingSentences: "বাক্য তৈরি হচ্ছে…",
-      aiPleaseWait: "একটু অপেক্ষা করুন",
+      aiPleaseWait: "একটু অপেক্ষা করুন", 
+      explainWithAI: "AI ব্যাখ্যা করুন",
+      aiExplanation: "AI-এর ব্যাখ্যা",
+      aiThinking: "ভাবছি…",
+      aiFail: "AI উত্তর দিতে পারল না"
       askAI: "AI দিয়ে পূরণ",
       askAILoading: "AI জিজ্ঞেস করছি…",
       askAISuccess: "AI ফিল্ড পূরণ করেছে",
