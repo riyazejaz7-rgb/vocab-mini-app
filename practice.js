@@ -9,13 +9,7 @@
   var uid = M.uid;
   var toast = M.toast;
 
-  var setup = {
-    mode: "bn_en",
-    count: 10,
-    source: "all",
-    rangeFrom: null,
-    rangeTo: null
-  };
+  var setup = { mode: "bn_en", count: 10, source: "all", rangeFrom: null, rangeTo: null };
 
   var session = null;
   var timerHandle = null;
@@ -25,19 +19,14 @@
 
   var IDLE_MS = 2 * 60 * 1000;
 
-  function getActiveWords() {
-    return M.words.filter(function (w) { return !w.deleted; });
-  }
+  function getActiveWords() { return M.words.filter(function (w) { return !w.deleted; }); }
 
   function getSourceWords() {
     var pool = getActiveWords();
-    if (setup.source === "new") {
-      pool = pool.filter(function (w) { return !w.practiced; });
-    } else if (setup.source === "wrong") {
-      pool = pool.filter(function (w) { return w.wrongCount && w.wrongCount > 0; });
-    } else if (setup.source === "due") {
-      pool = pool.filter(function (w) { return M.isDueToday(w.id); });
-    } else if (setup.source === "range") {
+    if (setup.source === "new") pool = pool.filter(function (w) { return !w.practiced; });
+    else if (setup.source === "wrong") pool = pool.filter(function (w) { return w.wrongCount && w.wrongCount > 0; });
+    else if (setup.source === "due") pool = pool.filter(function (w) { return M.isDueToday(w.id); });
+    else if (setup.source === "range") {
       var from = setup.rangeFrom || 1;
       var to = setup.rangeTo || 99999;
       pool = pool.filter(function (w) { return w.no >= from && w.no <= to; });
@@ -81,8 +70,7 @@
     h += '<button type="button" class="opt-btn' + (setup.mode === "bn_en" ? " on" : "") + '" data-set="mode" data-val="bn_en">' + t("mode_bn_en") + '</button>';
     h += '<button type="button" class="opt-btn' + (setup.mode === "en_bn" ? " on" : "") + '" data-set="mode" data-val="en_bn">' + t("mode_en_bn") + '</button>';
     h += '<button type="button" class="opt-btn' + (setup.mode === "fill" ? " on" : "") + '" data-set="mode" data-val="fill">' + t("mode_fill") + '</button>';
-    h += '</div>';
-    h += '</div>';
+    h += '</div></div>';
 
     h += '<div class="setup-section">';
     h += '<p class="setup-label">' + t("questionCount") + '</p>';
@@ -90,8 +78,7 @@
     [5, 10, 20].forEach(function (n) {
       h += '<button type="button" class="opt-btn' + (setup.count === n ? " on" : "") + '" data-set="count" data-val="' + n + '">' + n + '</button>';
     });
-    h += '</div>';
-    h += '</div>';
+    h += '</div></div>';
 
     h += '<div class="setup-section">';
     h += '<p class="setup-label">' + t("wordSource") + '</p>';
@@ -99,9 +86,7 @@
     h += '<button type="button" class="opt-btn' + (setup.source === "all" ? " on" : "") + '" data-set="source" data-val="all">' + t("source_all") + '</button>';
     h += '<button type="button" class="opt-btn' + (setup.source === "new" ? " on" : "") + '" data-set="source" data-val="new">' + t("source_new") + '</button>';
     h += '<button type="button" class="opt-btn' + (setup.source === "wrong" ? " on" : "") + '" data-set="source" data-val="wrong">' + t("source_wrong") + '</button>';
-    if (dueCount > 0) {
-      h += '<button type="button" class="opt-btn' + (setup.source === "due" ? " on" : "") + '" data-set="source" data-val="due">' + t("source_due") + ' (' + dueCount + ')</button>';
-    }
+    if (dueCount > 0) h += '<button type="button" class="opt-btn' + (setup.source === "due" ? " on" : "") + '" data-set="source" data-val="due">' + t("source_due") + ' (' + dueCount + ')</button>';
     h += '<button type="button" class="opt-btn' + (setup.source === "range" ? " on" : "") + '" data-set="source" data-val="range">' + t("source_range") + '</button>';
     h += '</div>';
 
@@ -126,7 +111,6 @@
     }
 
     h += '</div>';
-
     h += '<button type="button" class="practice-start" ' + (notEnough ? "disabled" : "") + ' data-act="practice-start">' + t("startPractice") + '</button>';
     if (notEnough) h += '<p class="muted center" style="margin-top:12px">' + t("practiceNoWords") + '</p>';
 
@@ -166,18 +150,14 @@
 
     var picked = customQuestions ? pool.slice() : pool.slice().sort(function () { return Math.random() - 0.5; }).slice(0, Math.min(setup.count, pool.length));
 
-    // For fill mode: batch-fetch sentences first
     var sentences = null;
-    if (setup.mode === "fill") {
-      sentences = await fetchBatchSentences(picked);
-    }
+    if (setup.mode === "fill") sentences = await fetchBatchSentences(picked);
 
     var now = Date.now();
-
     session = {
       mode: setup.mode,
       questions: picked,
-      sentences: sentences || {},   // { wordId: {sentence, blanked} }
+      sentences: sentences || {},
       current: 0,
       answers: [],
       answered: false,
@@ -198,7 +178,6 @@
 
   async function fetchBatchSentences(words) {
     if (!window.VocabAI || !window.VocabAI.batchSentences) return {};
-    // Show loading screen
     M.getAppEl().innerHTML = '<section class="view"><div class="empty"><div class="skeleton" style="height:80px;margin-bottom:10px"></div><div class="skeleton" style="height:80px;margin-bottom:10px"></div><p class="title" style="margin-top:20px">' + t("aiGeneratingSentences") + '</p><p>' + t("aiPleaseWait") + '</p></div></section>';
     M.setTitle(t("practice"));
 
@@ -208,13 +187,9 @@
       result.data.sentences.forEach(function (s, idx) {
         var w = words[parseInt(s.id, 10) - 1] || words[idx];
         if (!w) return;
-        map[w.id] = {
-          sentence: s.sentence || "",
-          blanked: s.blanked || s.sentence || ""
-        };
+        map[w.id] = { sentence: s.sentence || "", blanked: s.blanked || s.sentence || "" };
       });
     }
-    // Fallback for missing
     words.forEach(function (w) {
       if (!map[w.id]) {
         map[w.id] = {
@@ -263,8 +238,7 @@
     if (!session || session.paused || session.answered) return;
     session.paused = true;
     session.pauseStartedAt = Date.now();
-    if (auto) toast(t("pausedAuto"));
-    else toast(t("paused"));
+    toast(auto ? t("pausedAuto") : t("paused"));
     renderQuestion();
   }
 
@@ -285,11 +259,7 @@
   function checkAnswer(word, userInput) {
     var user = normalize(userInput);
     if (!user) return false;
-
-    if (session.mode === "bn_en" || session.mode === "fill") {
-      return normalize(word.en) === user;
-    }
-    // en_bn mode
+    if (session.mode === "bn_en" || session.mode === "fill") return normalize(word.en) === user;
     var userParts = user.split(/[,;،]+/).map(function (s) { return s.trim(); }).filter(Boolean);
     for (var i = 0; i < userParts.length; i++) {
       var up = userParts[i];
@@ -306,10 +276,10 @@
     if (session.mode === "en_bn") return word.bn.join(", ");
     return word.en;
   }
+
   function getQuestionText(word) {
     if (session.mode === "bn_en") return word.bn.join(", ");
     if (session.mode === "en_bn") return word.en;
-    // fill mode — show blanked sentence
     var s = session.sentences[word.id];
     if (s && s.blanked) return s.blanked;
     return "The word \"_____\" means " + (word.bn || []).join(", ") + ".";
@@ -319,6 +289,46 @@
     if (session.mode === "bn_en") return "বাংলা";
     if (session.mode === "en_bn") return "English";
     return t("fillInBlank");
+  }
+  async function handleAIExplain() {
+    if (!session || !session.answered) return;
+    var idx = session.current;
+    var ans = session.answers[idx];
+    if (!ans || ans.correct || ans.aiFeedback) return;
+
+    if (!window.VocabAI || !window.VocabAI.getFeedback) {
+      toast(t("aiFail"));
+      return;
+    }
+
+    var word = currentWord();
+    var correctText = getCorrectAnswerText(word);
+
+    var btn = document.querySelector('[data-act="ai-explain"]');
+    if (btn) { btn.disabled = true; btn.textContent = t("aiThinking"); }
+
+    var result = await window.VocabAI.getFeedback(
+      word.en,
+      correctText,
+      ans.userAnswer,
+      getQuestionText(word)
+    );
+
+    if (!result.ok) {
+      toast(result.error === "quota_exceeded" ? t("aiQuotaExceeded") : t("aiFail"));
+      if (btn) { btn.disabled = false; btn.textContent = "💡 " + t("explainWithAI"); }
+      return;
+    }
+
+    var fb = (result.data && result.data.feedback) || "";
+    if (!fb) {
+      toast(t("aiFail"));
+      if (btn) { btn.disabled = false; btn.textContent = "💡 " + t("explainWithAI"); }
+      return;
+    }
+
+    ans.aiFeedback = fb;
+    renderQuestion();
   }
 
   function renderQuestion() {
@@ -352,7 +362,6 @@
     }
     h += '</div>';
 
-    // Hint (fill mode only)
     if (isFill && !session.answered) {
       if (hintVisible) {
         h += '<div class="feedback" style="background:var(--accent-soft);color:var(--accent);border:1px solid rgba(13,148,136,0.25);text-align:center">💡 ' + t("hint") + ': <b>' + esc((word.bn || []).join(", ")) + '</b></div>';
@@ -369,8 +378,20 @@
 
     if (session.answered) {
       var ans = session.answers[session.current];
-      if (ans.correct) h += '<div class="feedback correct">✓ ' + t("correctLabel") + '</div>';
-      else h += '<div class="feedback wrong">✗ ' + t("wrongLabel") + '<span class="correct-answer">' + t("correctAnswerWas") + ' <b>' + esc(getCorrectAnswerText(word)) + '</b></span></div>';
+      if (ans.correct) {
+        h += '<div class="feedback correct">✓ ' + t("correctLabel") + '</div>';
+      } else {
+        h += '<div class="feedback wrong">✗ ' + t("wrongLabel") + '<span class="correct-answer">' + t("correctAnswerWas") + ' <b>' + esc(getCorrectAnswerText(word)) + '</b></span></div>';
+
+        if (ans.aiFeedback) {
+          h += '<div class="feedback" style="background:var(--accent-soft);color:var(--text);border:1px solid rgba(13,148,136,0.25);font-size:0.9rem;line-height:1.5;text-align:left">';
+          h += '<div style="font-weight:700;color:var(--accent);margin-bottom:6px">💡 ' + t("aiExplanation") + '</div>';
+          h += '<div>' + esc(ans.aiFeedback) + '</div>';
+          h += '</div>';
+        } else {
+          h += '<div style="text-align:center"><button type="button" data-act="ai-explain" style="background:transparent;border:1.5px dashed var(--accent);color:var(--accent);border-radius:10px;padding:10px 16px;font:inherit;font-size:0.88rem;font-weight:600;cursor:pointer">💡 ' + t("explainWithAI") + '</button></div>';
+        }
+      }
     }
 
     h += '<div class="practice-actions">';
@@ -583,6 +604,7 @@
     }
     if (a === "practice-resume") { doResume(); return true; }
     if (a === "show-hint") { hintVisible = true; renderQuestion(); return true; }
+    if (a === "ai-explain") { handleAIExplain(); return true; }
     if (a === "toggle-details") {
       showDetails = !showDetails;
       if (session) {
