@@ -6,7 +6,6 @@
 
   var t = M.t;
   var esc = M.esc;
-  var toast = M.toast;
 
   function fmtTime(ms) {
     var total = Math.floor(ms / 1000);
@@ -45,9 +44,11 @@
     });
 
     var dueWords = active.filter(function (w) { return M.isDueToday(w.id); });
-    var masteredCount = active.filter(function (w) { return M.isMastered(w.id); }).length;
+    var masteredCount = active.filter(function (w) {
+      var r = M.reviews[w.id];
+      return r && r.box >= 5;
+    }).length;
 
-    // Streak — consecutive days with sessions
     var daySet = {};
     M.sessions.forEach(function (s) {
       if (!s.date) return;
@@ -62,7 +63,6 @@
       var key = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
       if (daySet[key]) streak++;
       else {
-        // If today missing, check yesterday
         if (i === 0) {
           d.setDate(d.getDate() - 1);
           continue;
@@ -71,19 +71,7 @@
       }
       d.setDate(d.getDate() - 1);
     }
-    // AI Coach section
-    h += '<div class="section" style="background:linear-gradient(135deg,var(--accent-soft) 0%,var(--card) 100%);border-color:var(--accent)">';
-    h += '<h2>🤖 ' + t("coachTitle") + '</h2>';
-    h += '<p class="desc">' + t("coachDesc") + '</p>';
-    if (window._coachCache) {
-      h += '<div style="background:var(--card);padding:14px;border-radius:10px;font-size:0.92rem;line-height:1.6;white-space:pre-wrap;margin-top:8px">' + esc(window._coachCache) + '</div>';
-      h += '<div style="margin-top:10px"><button type="button" data-act="coach-refresh" style="background:transparent;border:1.5px solid var(--border);color:var(--text-soft);border-radius:10px;padding:8px 14px;font:inherit;font-size:0.85rem;font-weight:600;cursor:pointer">🔄 ' + t("coachRefresh") + '</button></div>';
-    } else {
-      h += '<div class="row" style="margin-top:10px"><button type="button" data-act="coach-ask" class="primary" style="width:100%;padding:14px;border-radius:12px;font-weight:700">💡 ' + t("coachAsk") + '</button></div>';
-    }
-    h += '</div>';
 
-    // Weekly chart data (last 7 days)
     var weekBars = [];
     for (var k = 6; k >= 0; k--) {
       var day = new Date();
@@ -115,13 +103,10 @@
 
   function render() {
     var s = computeStats();
-    var lang = M.lang;
-
     var maxBar = s.weekBars.reduce(function (a, b) { return Math.max(a, b.count); }, 1);
 
     var h = '<section class="view">';
 
-    // Top stats grid
     h += '<div class="stats" style="grid-template-columns: repeat(2, 1fr)">';
     h += '<div class="stat"><span class="n">' + s.todayWords + '</span><span class="l">' + t("statsTodayPracticed") + '</span></div>';
     h += '<div class="stat"><span class="n">' + s.weekWords + '</span><span class="l">' + t("statsWeekPracticed") + '</span></div>';
@@ -129,14 +114,12 @@
     h += '<div class="stat"><span class="n">' + s.masteredCount + '</span><span class="l">' + t("statsMastered") + '</span></div>';
     h += '</div>';
 
-    // Streak
     h += '<div class="section" style="text-align:center;padding:20px">';
     h += '<div style="font-size:2.5rem;line-height:1">🔥</div>';
     h += '<div style="font-size:1.8rem;font-weight:800;color:var(--accent);margin-top:6px">' + s.streak + '</div>';
     h += '<div style="font-size:0.85rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;font-weight:600">' + t("statsStreak") + ' · ' + t("statsDays") + '</div>';
     h += '</div>';
 
-    // Due today
     h += '<div class="section">';
     h += '<h2>' + t("statsDueToday") + '</h2>';
     if (s.dueCount === 0) {
@@ -151,7 +134,18 @@
     }
     h += '</div>';
 
-    // Weekly chart
+    // AI Coach section
+    h += '<div class="section" style="background:linear-gradient(135deg,var(--accent-soft) 0%,var(--card) 100%);border-color:var(--accent)">';
+    h += '<h2>🤖 ' + t("coachTitle") + '</h2>';
+    h += '<p class="desc">' + t("coachDesc") + '</p>';
+    if (window._coachCache) {
+      h += '<div style="background:var(--card);padding:14px;border-radius:10px;font-size:0.92rem;line-height:1.6;white-space:pre-wrap;margin-top:8px">' + esc(window._coachCache) + '</div>';
+      h += '<div style="margin-top:10px"><button type="button" data-act="coach-refresh" style="background:transparent;border:1.5px solid var(--border);color:var(--text-soft);border-radius:10px;padding:8px 14px;font:inherit;font-size:0.85rem;font-weight:600;cursor:pointer">🔄 ' + t("coachRefresh") + '</button></div>';
+    } else {
+      h += '<div class="row" style="margin-top:10px"><button type="button" data-act="coach-ask" class="primary" style="width:100%;padding:14px;border-radius:12px;font-weight:700">💡 ' + t("coachAsk") + '</button></div>';
+    }
+    h += '</div>';
+
     h += '<div class="section">';
     h += '<h2>' + t("statsWeeklyChart") + '</h2>';
     h += '<div style="display:flex;align-items:flex-end;justify-content:space-between;gap:6px;height:120px;margin-top:16px">';
@@ -169,10 +163,12 @@
     h += '</div>';
     h += '</div>';
 
-    // Mastered words
     h += '<div class="section">';
     h += '<h2>' + t("statsMasteredList") + '</h2>';
-    var masteredWords = M.words.filter(function (w) { return !w.deleted && M.isMastered(w.id); });
+    var masteredWords = M.words.filter(function (w) { 
+      var r = M.reviews[w.id];
+      return !w.deleted && r && r.box >= 5;
+    });
     if (!masteredWords.length) {
       h += '<p class="desc">' + t("statsMasteredEmpty") + '</p>';
     } else {
@@ -188,9 +184,9 @@
     }
     h += '</div>';
 
-    // Review schedule (learning words)
     var learningWords = M.words.filter(function (w) {
-      return !w.deleted && !M.isMastered(w.id);
+      var r = M.reviews[w.id];
+      return !w.deleted && (!r || r.box < 5);
     }).sort(function (a, b) {
       var ra = M.reviews[a.id] || {};
       var rb = M.reviews[b.id] || {};
@@ -231,9 +227,10 @@
     M.showFab(false);
     M.showBack(false);
   }
+
   async function askCoach() {
     if (!window.VocabAI || !window.VocabAI.getCoach) {
-      alert("AI not available");
+      alert("AI not available. Check login.");
       return;
     }
 
@@ -258,7 +255,10 @@
 
     historyLines.push("");
     historyLines.push("Total words: " + activeWords.length);
-    var mastered = activeWords.filter(function (w) { return M.isMastered(w.id); }).length;
+    var mastered = activeWords.filter(function (w) {
+       var r = M.reviews[w.id];
+       return r && r.box >= 5;
+    }).length;
     historyLines.push("Mastered: " + mastered);
 
     var history = historyLines.join("\n");
