@@ -291,3 +291,479 @@
     if (session.mode === "en_bn") return "English";
     return t("fillInBlank");
   }
+  async function fetchQuizForWord(word) {
+    // Get 3 random distractors from other words
+    var others = getActiveWords().filter(function (w) { return w.id !== word.id && w.en && w.bn && w.bn.length; });
+    var shuffled = others.sort(function () { return Math.random() - 0.5; });
+    var distractors = shuffled.slice(0, 3);
+    if (distractors.length < 3) return null;
+
+    if (!window.VocabAI || !window.VocabAI.makeQuiz) return null;
+    var result = await window.VocabAI.makeQuiz(word, distractors);
+    if (!result.ok || !result.data) return null;
+    var d = result.data;
+    if (!Array.isArray(d.options) || d.options.length !== 4) return null;
+    return {
+      question: d.question || word.bn.join(", "),
+      options: d.options,
+      correct: d.correct || word.en
+    };
+  }
+
+  async function renderQuizQuestion() {
+    var word = currentWord();
+    if (!word) return finishSession();
+
+    // Load quiz if not already loaded
+    if (!session.quizzes) session.quizzes = {};
+    if (!session.quizzes[word.id]) {
+      M.getAppEl().innerHTML = '<section class="view"><div class="empty"><div class="skeleton" style="height:80px;margin-bottom:10px"></div><p class="title" style="margin-top:20px">' + t("aiGeneratingQuiz") + '</p><p>' + t("aiPleaseWait") + '</p></div></section>';
+      var quiz = await fetchQuizForWord(word);
+      if (!quiz) {
+        // Fallback: skip to next
+        session.current++;
+        if (session.current >= session.questions.length) return finishSession();
+        return renderQuizQuestion();
+      }
+      session.quizzes[word.id] = quiz;
+    }
+
+    var q = session.quizzes[word.id];
+    var total = session.questions.length;
+    var n = session.current + 1;
+    var pct = ((session.current) / total) * 100;
+
+    var h = '<section class="view practice-session">';
+    h += '<div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%"></div></div>';
+    h += '<div class="q-counter">';
+    h += '<span>' + t("questionOf", { n: n, total: total }) + '</span>';
+    h += '<span style="display:flex;align-items:center;gap:8px">';
+    h += '<span id="timer" style="font-family:ui-monospace,monospace;font-weight:700;color:var(--accent)">' + fmtTime(session.elapsedMs) + '</span>';
+    if (!session.answered) {
+      h += '<button type="button" data-act="practice-pause" style="background:transparent;border:1.5px solid var(--border);color:var(--text-soft);border-radius:8px;padding:4px 10px;font-size:0.75rem;font-weight:600;cursor:pointer">' + (session.paused ? "▶" : "⏸") + '</button>';
+    }
+    h += '</span></div>';
+
+    if (session.paused) h += '<div class="feedback" style="background:var(--warn-soft);color:var(--warn);border:1px solid rgba(217,119,6,0.25);text-align:center;font-weight:600">⏸ ' + t("pausedLabel") + '</div>';
+
+    h += '<div class="question-card">';
+    h += '<div class="question-prompt">' + t("quizPrompt") + '</div>';
+    h += '<div class="question-text bengali">' + esc(q.question) + '</div>';
+    h += '</div>';
+
+    // Options
+    h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0">';
+    q.options.forEach(function (opt) {
+      var cls = "quiz-opt";
+      if (session.answered) {
+        var isCorrect = opt === q.correct;
+        var isPicked = session.answers[session.current] && session.answers[session.current].userAnswer === opt;
+        if (isCorrect) cls += " correct";
+        else if (isPicked) cls += " wrong";
+      }
+      h += '<button type="button" class="' + cls + '" data-act="quiz-pick" data-val="' + esc(opt) + '"' + (session.answered ? " disabled" : "") + '>' + esc(opt) + '</button>';
+    });
+    h += '</div>';
+
+    if (session.answered) {
+      var ans = session.answers[session.current];
+      if (ans.correct) {
+        h += '<div class="feedback correct">✓ ' + t("correctLabel") + '</div>';
+      } else {
+        h += '<div class="feedback wrong">✗ ' + t("wrongLabel") + '<span class="correct-answer">' + t("correctAnswerWas") + ' <b>' + esc(q.correct) + '</b></span></div>';
+        if (ans.aiFeedback) {
+          h += '<div class="feedback" style="background:var(--accent-soft);color:var(--text);border:1px solid rgba(13,148,136,0.25);font-size:0.9rem;line-height:1.5;text-align:left">';
+          h += '<div style="font-weight:700;color:var(--accent);margin-bottom:6px">💡 ' + t("aiExplanation") + '</div>';
+          h += '<div>' + esc(ans.aiFeedback) + '</div>';
+          h += '</div>';
+        } else {
+          h += '<div style="text-align:center"><button type="button" data-act="ai-explain" style="background:transparent;border:1.5px dashed var(--accent);color:var(--accent);border-radius:10px;padding:10px 16px;font:inherit;font-size:0.88rem;font-weight:600;cursor:pointer">💡 ' + t("explainWithAI") + '</button></div>';
+        }
+      }
+    }
+
+    h += '<div class="practice-actions">';
+    if (session.paused) {
+      h += '<button type="button" class="btn-check" data-act="practice-resume">' + t("resume") + '</button>';
+    } else if (session.answered) {
+      var isLast = session.current === session.questions.length - 1;
+      h += '<button type="button" class="btn-next" data-act="practice-next">' + (isLast ? t("finish") : t("next")) + '</button>';
+    }
+    h += '</div></section>';
+
+    M.getAppEl().innerHTML = h;
+    M.setTitle(t("practice"));
+    M.setActiveNav("practice");
+    M.showFab(false);
+    M.showBack(false);
+  }
+
+  function renderQuestion() {
+    if (setup.mode === "quiz") return renderQuizQuestion();
+
+    var word = currentWord();
+    if (!word) return finishSession();
+
+    var total = session.questions.length;
+    var n = session.current + 1;
+    var pct = ((session.current) / total) * 100;
+    var isFill = session.mode === "fill";
+
+    var h = '<section class="view practice-session">';
+    h += '<div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%"></div></div>';
+    h += '<div class="q-counter">';
+    h += '<span>' + t("questionOf", { n: n, total: total }) + '</span>';
+    h += '<span style="display:flex;align-items:center;gap:8px">';
+    h += '<span id="timer" style="font-family:ui-monospace,monospace;font-weight:700;color:var(--accent)">' + fmtTime(session.elapsedMs) + '</span>';
+    if (!session.answered) {
+      h += '<button type="button" data-act="practice-pause" style="background:transparent;border:1.5px solid var(--border);color:var(--text-soft);border-radius:8px;padding:4px 10px;font-size:0.75rem;font-weight:600;cursor:pointer">' + (session.paused ? "▶" : "⏸") + '</button>';
+    }
+    h += '</span></div>';
+
+    if (session.paused) h += '<div class="feedback" style="background:var(--warn-soft);color:var(--warn);border:1px solid rgba(217,119,6,0.25);text-align:center;font-weight:600">⏸ ' + t("pausedLabel") + '</div>';
+
+    h += '<div class="question-card">';
+    h += '<div class="question-prompt">' + esc(getQuestionLabel()) + '</div>';
+    if (isFill) {
+      h += '<div class="question-text" style="font-size:1.15rem;font-weight:500;line-height:1.5">' + esc(getQuestionText(word)) + '</div>';
+    } else {
+      h += '<div class="question-text' + (session.mode === "bn_en" ? " bengali" : "") + '">' + esc(getQuestionText(word)) + '</div>';
+    }
+    h += '</div>';
+
+    if (isFill && !session.answered) {
+      if (hintVisible) {
+        h += '<div class="feedback" style="background:var(--accent-soft);color:var(--accent);border:1px solid rgba(13,148,136,0.25);text-align:center">💡 ' + t("hint") + ': <b>' + esc((word.bn || []).join(", ")) + '</b></div>';
+      } else {
+        h += '<div style="text-align:center"><button type="button" data-act="show-hint" style="background:transparent;border:1.5px dashed var(--border);color:var(--text-muted);border-radius:10px;padding:8px 16px;font:inherit;font-size:0.85rem;font-weight:600;cursor:pointer">💡 ' + t("showHint") + '</button></div>';
+      }
+    }
+
+    h += '<div class="answer-area">';
+    var inputClass = "answer-input";
+    if (session.answered) inputClass += session.answers[session.current].correct ? " correct" : " wrong";
+    h += '<input id="answer" type="text" class="' + inputClass + '" placeholder="' + esc(t("typeYourAnswer")) + '" value="' + esc(session.userAnswer) + '" autocomplete="off" autocapitalize="off" spellcheck="false"' + (session.answered || session.paused ? " readonly" : "") + '>';
+    h += '</div>';
+
+    if (session.answered) {
+      var ans = session.answers[session.current];
+      if (ans.correct) {
+        h += '<div class="feedback correct">✓ ' + t("correctLabel") + '</div>';
+      } else {
+        h += '<div class="feedback wrong">✗ ' + t("wrongLabel") + '<span class="correct-answer">' + t("correctAnswerWas") + ' <b>' + esc(getCorrectAnswerText(word)) + '</b></span></div>';
+        if (ans.aiFeedback) {
+          h += '<div class="feedback" style="background:var(--accent-soft);color:var(--text);border:1px solid rgba(13,148,136,0.25);font-size:0.9rem;line-height:1.5;text-align:left">';
+          h += '<div style="font-weight:700;color:var(--accent);margin-bottom:6px">💡 ' + t("aiExplanation") + '</div>';
+          h += '<div>' + esc(ans.aiFeedback) + '</div>';
+          h += '</div>';
+        } else {
+          h += '<div style="text-align:center"><button type="button" data-act="ai-explain" style="background:transparent;border:1.5px dashed var(--accent);color:var(--accent);border-radius:10px;padding:10px 16px;font:inherit;font-size:0.88rem;font-weight:600;cursor:pointer">💡 ' + t("explainWithAI") + '</button></div>';
+        }
+      }
+    }
+
+    h += '<div class="practice-actions">';
+    if (session.paused) h += '<button type="button" class="btn-check" data-act="practice-resume">' + t("resume") + '</button>';
+    else if (!session.answered) h += '<button type="button" class="btn-check" data-act="practice-check">' + t("check") + '</button>';
+    else {
+      var isLast2 = session.current === session.questions.length - 1;
+      h += '<button type="button" class="btn-next" data-act="practice-next">' + (isLast2 ? t("finish") : t("next")) + '</button>';
+    }
+    h += '</div></section>';
+
+    M.getAppEl().innerHTML = h;
+    M.setTitle(t("practice"));
+    M.setActiveNav("practice");
+    M.showFab(false);
+    M.showBack(false);
+
+    if (!session.answered && !session.paused) {
+      var inp = document.getElementById("answer");
+      if (inp) {
+        setTimeout(function () { inp.focus(); }, 100);
+        inp.addEventListener("input", function () { session.userAnswer = inp.value; resetIdle(); });
+        inp.addEventListener("keydown", function (e) {
+          if (e.key === "Enter") { e.preventDefault(); doCheck(); }
+        });
+      }
+    }
+  }
+
+  function doCheck() {
+    if (session.answered || session.paused) return;
+    var word = currentWord();
+    var ans = session.userAnswer;
+    var correct = checkAnswer(word, ans);
+    var now = Date.now();
+
+    session.answers[session.current] = {
+      id: word.id,
+      correct: correct,
+      userAnswer: ans,
+      timeMs: now - session.questionStartAt
+    };
+    session.answered = true;
+    renderQuestion();
+  }
+
+  function doQuizPick(val) {
+    if (session.answered || session.paused) return;
+    var word = currentWord();
+    var q = session.quizzes[word.id];
+    if (!q) return;
+    var correct = (val === q.correct);
+    var now = Date.now();
+
+    session.answers[session.current] = {
+      id: word.id,
+      correct: correct,
+      userAnswer: val,
+      timeMs: now - session.questionStartAt
+    };
+    session.answered = true;
+    renderQuestion();
+  }
+
+  async function handleAIExplain() {
+    if (!session || !session.answered) return;
+    var idx = session.current;
+    var ans = session.answers[idx];
+    if (!ans || ans.correct || ans.aiFeedback) return;
+
+    if (!window.VocabAI || !window.VocabAI.getFeedback) {
+      toast(t("aiFail"));
+      return;
+    }
+
+    var word = currentWord();
+    var correctText = (session.mode === "quiz" && session.quizzes[word.id]) ? session.quizzes[word.id].correct : getCorrectAnswerText(word);
+    var questionText = (session.mode === "quiz" && session.quizzes[word.id]) ? session.quizzes[word.id].question : getQuestionText(word);
+
+    var btn = document.querySelector('[data-act="ai-explain"]');
+    if (btn) { btn.disabled = true; btn.textContent = t("aiThinking"); }
+
+    var result = await window.VocabAI.getFeedback(word.en, correctText, ans.userAnswer, questionText);
+
+    if (!result.ok) {
+      toast(result.error === "quota_exceeded" ? t("aiQuotaExceeded") : t("aiFail"));
+      if (btn) { btn.disabled = false; btn.textContent = "💡 " + t("explainWithAI"); }
+      return;
+    }
+
+    var fb = (result.data && result.data.feedback) || "";
+    if (!fb) {
+      toast(t("aiFail"));
+      if (btn) { btn.disabled = false; btn.textContent = "💡 " + t("explainWithAI"); }
+      return;
+    }
+
+    ans.aiFeedback = fb;
+    renderQuestion();
+  }
+
+  function doNext() {
+    session.answered = false;
+    session.userAnswer = "";
+    hintVisible = false;
+    session.current++;
+    session.questionStartAt = Date.now();
+    if (session.current >= session.questions.length) finishSession();
+    else { resetIdle(); renderQuestion(); }
+  }
+
+  async function finishSession() {
+    stopTimer();
+
+    var correct = session.answers.filter(function (a) { return a.correct; }).length;
+    var total = session.questions.length;
+    var pct = Math.round((correct / total) * 100);
+    var totalMs = session.elapsedMs;
+    var avgMs = Math.round(totalMs / total);
+
+    try {
+      var se = {
+        id: uid(),
+        date: session.startedAt,
+        mode: session.mode,
+        total: total,
+        correct: correct,
+        durationMs: totalMs,
+        answers: session.answers.map(function (a) {
+          return { id: a.id, correct: a.correct, userAnswer: a.userAnswer, timeMs: a.timeMs };
+        })
+      };
+      await M.dbPutSession(se);
+      if (M.sessions && Array.isArray(M.sessions)) M.sessions.unshift(se);
+    } catch (e) { console.error(e); }
+
+    try {
+      for (var i = 0; i < session.answers.length; i++) {
+        await M.updateReviewAfterAnswer(session.answers[i].id, session.answers[i].correct);
+      }
+    } catch (e) { console.error(e); }
+
+    renderResult(correct, total, pct, totalMs, avgMs);
+    saveSessionStats();
+  }
+
+  function renderResult(correct, total, pct, totalMs, avgMs) {
+    var emoji = pct >= 80 ? "🎉" : pct >= 50 ? "👍" : "💪";
+    var title = pct >= 80 ? t("resultGreat") : pct >= 50 ? t("resultGood") : t("resultOk");
+
+    var h = '<section class="view">';
+    h += '<div class="result-card">';
+    h += '<div class="result-emoji">' + emoji + '</div>';
+    h += '<h2 class="result-title">' + title + '</h2>';
+    h += '<p class="result-sub">' + t("youGot", { c: correct, t: total }) + '</p>';
+
+    h += '<div class="result-score">';
+    h += '<div class="correct"><span class="num">' + correct + '</span><span class="lbl">' + t("correctLabel") + '</span></div>';
+    h += '<div class="wrong"><span class="num">' + (total - correct) + '</span><span class="lbl">' + t("wrongLabel") + '</span></div>';
+    h += '<div><span class="num">' + pct + '%</span><span class="lbl">' + t("accuracy") + '</span></div>';
+    h += '</div>';
+
+    h += '<div class="result-score" style="margin-top:6px">';
+    h += '<div><span class="num" style="font-size:1.3rem">' + fmtTime(totalMs) + '</span><span class="lbl">' + t("totalTime") + '</span></div>';
+    h += '<div><span class="num" style="font-size:1.3rem">' + fmtTime(avgMs) + '</span><span class="lbl">' + t("avgTime") + '</span></div>';
+    h += '</div>';
+
+    h += '<div style="margin-top:16px"><button type="button" data-act="toggle-details" style="width:100%;padding:12px;border:1.5px solid var(--border);background:var(--card);color:var(--text-soft);border-radius:12px;font:inherit;font-weight:600;font-size:0.9rem;cursor:pointer">' + (showDetails ? "▲ " + t("hideDetails") : "▼ " + t("viewDetails")) + '</button></div>';
+
+    if (showDetails) {
+      h += '<div style="margin-top:12px;text-align:left">';
+      session.answers.forEach(function (a) {
+        var w = M.words.find(function (x) { return x.id === a.id; });
+        if (!w) return;
+        var sec = Math.round(a.timeMs / 1000);
+        h += '<div style="padding:10px 12px;margin-bottom:6px;background:var(--surface);border-radius:10px;border-left:3px solid ' + (a.correct ? "var(--ok)" : "var(--danger)") + '">';
+        h += '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px">';
+        h += '<div><span style="font-weight:700;color:' + (a.correct ? "var(--ok)" : "var(--danger)") + '">' + (a.correct ? "✓" : "✗") + '</span> ';
+        h += '<span style="font-size:0.75rem;color:var(--text-muted);font-weight:700">#' + w.no + '</span> ';
+        h += '<span style="font-weight:600">' + esc(w.en) + '</span></div>';
+        h += '<span style="font-size:0.75rem;color:var(--text-muted);font-family:ui-monospace,monospace">' + sec + 's</span>';
+        h += '</div>';
+        if (!a.correct) {
+          h += '<div style="font-size:0.82rem;color:var(--text-muted);margin-top:6px">';
+          h += '<span>' + t("youWrote") + ' <b style="color:var(--danger)">' + esc(a.userAnswer || "(empty)") + '</b></span><br>';
+          h += '<span>' + t("correctAnswer") + ' <b style="color:var(--ok)">' + esc(getCorrectAnswerText(w)) + '</b></span>';
+          h += '</div>';
+        }
+        h += '</div>';
+      });
+      h += '</div>';
+    }
+
+    h += '<div class="practice-actions" style="margin-top:20px">';
+    h += '<button type="button" class="btn-next" data-act="practice-again">' + t("tryAgain") + '</button>';
+    if (correct < total) h += '<button type="button" class="btn-check" data-act="practice-wrong">' + t("practiceWrong") + '</button>';
+    h += '</div>';
+
+    h += '<div class="practice-actions" style="margin-top:10px">';
+    h += '<button type="button" class="btn-check" data-act="practice-done" style="background:var(--surface);color:var(--text);border:1.5px solid var(--border)">' + t("done") + '</button>';
+    h += '</div>';
+
+    h += '</div></section>';
+
+    M.getAppEl().innerHTML = h;
+    M.setTitle(t("practice"));
+    M.setActiveNav("practice");
+    M.showFab(false);
+    M.showBack(false);
+  }
+
+  async function saveSessionStats() {
+    for (var i = 0; i < session.answers.length; i++) {
+      var a = session.answers[i];
+      var w = M.words.find(function (x) { return x.id === a.id; });
+      if (!w) continue;
+      w.practiced = true;
+      if (a.correct) w.correctCount = (w.correctCount || 0) + 1;
+      else w.wrongCount = (w.wrongCount || 0) + 1;
+      w.lastPracticed = Date.now();
+      w.updated = Date.now();
+      try { await M.dbPutWord(w); } catch (e) {}
+    }
+  }
+
+  function open() {
+    stopTimer();
+    session = null;
+    showDetails = false;
+    hintVisible = false;
+    renderSetup();
+  }
+
+  function handleClick(e) {
+    var setBtn = e.target.closest("[data-set]");
+    if (setBtn && !session) {
+      var key = setBtn.dataset.set;
+      var val = setBtn.dataset.val;
+      if (key === "count") val = parseInt(val, 10);
+      setup[key] = val;
+      if (key === "source" && val !== "range") { setup.rangeFrom = null; setup.rangeTo = null; }
+      renderSetup();
+      return true;
+    }
+
+    var rangeBtn = e.target.closest("[data-range-from]");
+    if (rangeBtn && !session) {
+      setup.rangeFrom = parseInt(rangeBtn.dataset.rangeFrom, 10);
+      setup.rangeTo = parseInt(rangeBtn.dataset.rangeTo, 10);
+      renderSetup();
+      return true;
+    }
+
+    var act = e.target.closest("[data-act]");
+    if (!act) return false;
+    var a = act.dataset.act;
+
+    if (a === "practice-start") { startSession(); return true; }
+    if (a === "practice-check") { doCheck(); return true; }
+    if (a === "practice-next") { doNext(); return true; }
+    if (a === "practice-pause") {
+      if (session && session.paused) doResume();
+      else doPause(false);
+      return true;
+    }
+    if (a === "practice-resume") { doResume(); return true; }
+    if (a === "show-hint") { hintVisible = true; renderQuestion(); return true; }
+    if (a === "ai-explain") { handleAIExplain(); return true; }
+    if (a === "quiz-pick") { doQuizPick(act.dataset.val); return true; }
+    if (a === "toggle-details") {
+      showDetails = !showDetails;
+      if (session) {
+        var correct = session.answers.filter(function (x) { return x.correct; }).length;
+        var total = session.questions.length;
+        var pct = Math.round((correct / total) * 100);
+        renderResult(correct, total, pct, session.elapsedMs, Math.round(session.elapsedMs / total));
+      }
+      return true;
+    }
+    if (a === "practice-again") { stopTimer(); session = null; showDetails = false; hintVisible = false; renderSetup(); return true; }
+    if (a === "practice-wrong") {
+      var wrongIds = session.answers.filter(function (x) { return !x.correct; }).map(function (x) { return x.id; });
+      var wrongWords = M.words.filter(function (w) { return wrongIds.indexOf(w.id) > -1; });
+      stopTimer(); session = null; showDetails = false; hintVisible = false;
+      if (wrongWords.length) startSession(wrongWords);
+      return true;
+    }
+    if (a === "practice-done") {
+      stopTimer(); session = null; showDetails = false; hintVisible = false;
+      var navWords = document.querySelector('[data-nav="words"]');
+      if (navWords) navWords.click();
+      return true;
+    }
+    return false;
+  }
+
+  window.Practice = { open: open, handleClick: handleClick };
+
+  document.addEventListener("click", function (e) {
+    if (handleClick(e)) e.stopPropagation();
+  }, true);
+
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden && session && !session.paused && !session.answered) doPause(true);
+  });
+
+})();
