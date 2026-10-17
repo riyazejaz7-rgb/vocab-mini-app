@@ -1,6 +1,6 @@
 /* ============================================================
    Vocabulary Mini App — ai.js
-   Phase 6b: batch sentences + fill in the blanks
+   Phase 6d: quiz + coach functions
    ============================================================ */
 
 (function () {
@@ -86,6 +86,21 @@
     });
   }
 
+  /** Quiz: generate a 4-option multiple choice question */
+  function makeQuiz(word, distractors) {
+    return call("quiz", {
+      word: { en: word.en, bn: (word.bn || []).join(", ") },
+      distractors: (distractors || []).map(function (d) {
+        return { en: d.en, bn: (d.bn || []).join(", ") };
+      })
+    });
+  }
+
+  /** Coach: personalized plan based on history */
+  function getCoach(history) {
+    return call("coach", { history: history });
+  }
+
   window.VocabAI = {
     getState: function () { return state; },
 
@@ -98,6 +113,10 @@
     },
 
     batchSentences: batchSentences,
+
+    makeQuiz: makeQuiz,
+
+    getCoach: getCoach,
 
     getFeedback: function (en, correct, userAnswer, question) {
       return call("feedback", { en: en, correct: correct, userAnswer: userAnswer, question: question });
