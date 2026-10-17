@@ -71,6 +71,17 @@
       }
       d.setDate(d.getDate() - 1);
     }
+    // AI Coach section
+    h += '<div class="section" style="background:linear-gradient(135deg,var(--accent-soft) 0%,var(--card) 100%);border-color:var(--accent)">';
+    h += '<h2>🤖 ' + t("coachTitle") + '</h2>';
+    h += '<p class="desc">' + t("coachDesc") + '</p>';
+    if (window._coachCache) {
+      h += '<div style="background:var(--card);padding:14px;border-radius:10px;font-size:0.92rem;line-height:1.6;white-space:pre-wrap;margin-top:8px">' + esc(window._coachCache) + '</div>';
+      h += '<div style="margin-top:10px"><button type="button" data-act="coach-refresh" style="background:transparent;border:1.5px solid var(--border);color:var(--text-soft);border-radius:10px;padding:8px 14px;font:inherit;font-size:0.85rem;font-weight:600;cursor:pointer">🔄 ' + t("coachRefresh") + '</button></div>';
+    } else {
+      h += '<div class="row" style="margin-top:10px"><button type="button" data-act="coach-ask" class="primary" style="width:100%;padding:14px;border-radius:12px;font-weight:700">💡 ' + t("coachAsk") + '</button></div>';
+    }
+    h += '</div>';
 
     // Weekly chart data (last 7 days)
     var weekBars = [];
@@ -220,21 +231,84 @@
     M.showFab(false);
     M.showBack(false);
   }
+  async function askCoach() {
+    if (!window.VocabAI || !window.VocabAI.getCoach) {
+      alert("AI not available");
+      return;
+    }
+
+    var sessions = M.sessions.slice(0, 20);
+    var activeWords = M.words.filter(function (w) { return !w.deleted; });
+
+    var historyLines = ["Recent practice sessions:"];
+    sessions.forEach(function (s) {
+      var modeName = s.mode === "bn_en" ? "বাংলা → English" : s.mode === "en_bn" ? "English → বাংলা" : s.mode === "fill" ? "Fill blank" : "AI Quiz";
+      historyLines.push("- " + new Date(s.date).toLocaleDateString() + ": " + s.correct + "/" + s.total + " (" + modeName + ")");
+    });
+
+    historyLines.push("");
+    historyLines.push("Weak words (most wrong):");
+    var weak = activeWords.filter(function (w) { return w.wrongCount && w.wrongCount > 0; })
+      .sort(function (a, b) { return (b.wrongCount || 0) - (a.wrongCount || 0); })
+      .slice(0, 5);
+    weak.forEach(function (w) {
+      historyLines.push("- " + w.en + " (" + (w.bn || []).join(", ") + ") — " + w.wrongCount + " wrongs");
+    });
+    if (!weak.length) historyLines.push("- (none yet)");
+
+    historyLines.push("");
+    historyLines.push("Total words: " + activeWords.length);
+    var mastered = activeWords.filter(function (w) { return M.isMastered(w.id); }).length;
+    historyLines.push("Mastered: " + mastered);
+
+    var history = historyLines.join("\n");
+
+    M.getAppEl().innerHTML = '<section class="view"><div class="empty"><div class="skeleton" style="height:80px;margin-bottom:10px"></div><p class="title" style="margin-top:20px">' + t("coachThinking") + '</p></div></section>';
+
+    var result = await window.VocabAI.getCoach(history);
+
+    if (!result.ok) {
+      alert("AI failed: " + (result.message || result.error));
+      render();
+      return;
+    }
+
+    var coach = (result.data && result.data.coach) || "";
+    if (!coach) {
+      alert("No coach response");
+      render();
+      return;
+    }
+
+    window._coachCache = coach;
+    render();
+  }
 
   function handleClick(e) {
     var act = e.target.closest("[data-act]");
     if (!act) return false;
+
     if (act.dataset.act === "stats-review") {
-      // Jump to practice with due source
       var navPractice = document.querySelector('[data-nav="practice"]');
       if (navPractice) navPractice.click();
-      // Give practice.js a tick to render, then click "due"
       setTimeout(function () {
         var dueBtn = document.querySelector('[data-set="source"][data-val="due"]');
         if (dueBtn) dueBtn.click();
       }, 100);
       return true;
     }
+
+    if (act.dataset.act === "coach-ask") {
+      askCoach();
+      return true;
+    }
+
+    if (act.dataset.act === "coach-refresh") {
+      window._coachCache = null;
+      render();
+      return true;
+    }
+
     return false;
   }
 
