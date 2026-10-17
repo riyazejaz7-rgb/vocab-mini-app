@@ -123,7 +123,10 @@
       aiNeedWord: "Enter the English word first",
       aiNeedLogin: "Log in to cloud sync first",
       aiQuotaExceeded: "AI daily limit reached",
-      aiUsedToday: "AI used today: {n}/{max}"
+      aiUsedToday: "AI used today: {n}/{max}",
+      mode_quiz: "AI Quiz",
+      quizPrompt: "Choose the correct English word",
+      aiGeneratingQuiz: "Generating quiz…"
     },
     bn: {
       words: "শব্দ", trash: "ট্র্যাশ", tools: "টুলস", practice: "প্র্যাকটিস", stats: "স্ট্যাটস",
@@ -231,7 +234,10 @@
       aiNeedWord: "প্রথমে ইংরেজি শব্দ লিখুন",
       aiNeedLogin: "প্রথমে ক্লাউড সিঙ্কে লগইন করুন",
       aiQuotaExceeded: "আজকের AI সীমা শেষ",
-      aiUsedToday: "আজ AI ব্যবহার: {n}/{max}"
+      aiUsedToday: "আজ AI ব্যবহার: {n}/{max}",
+      mode_quiz: "AI কুইজ",
+      quizPrompt: "সঠিক ইংরেজি শব্দটি বেছে নিন",
+      aiGeneratingQuiz: "কুইজ তৈরি হচ্ছে…"
     }
   };
 
