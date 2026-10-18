@@ -805,7 +805,22 @@
 
     toast(t("askAISuccess"));
   }
-
+  async function renumberWords() {
+    // শুধু একটিভ ওয়ার্ডগুলো নাও এবং আগের নম্বর অনুযায়ী সাজাও
+    var active = words.filter(function (w) { return !w.deleted; }).sort(function (a, b) { return a.no - b.no; });
+    
+    // ১, ২, ৩... করে নতুন নম্বর বসাও
+    for (var i = 0; i < active.length; i++) {
+      if (active[i].no !== i + 1) {
+        active[i].no = i + 1;
+        active[i].updated = Date.now();
+        await dbPutWord(active[i]);
+      }
+    }
+    
+    // কাউন্টার রিসেট করো (যাতে পরের ওয়ার্ড সঠিক নাম্বার পায়)
+    await metaSet("nextNo", active.length + 1);
+  }
   async function saveWord() {
     var en = ($("f_en").value || "").trim();
     var bn = splitList($("f_bn").value);
@@ -852,10 +867,10 @@
     w.updated = Date.now();
     await dbPutWord(w);
     toast(t("deleted"));
+    await renumberWords(); // নতুন করে ১,২,৩ সাজানোর ফাংশন কল
     go("words");
     backgroundSync();
   }
-
   async function restoreWord(id) {
     var w = getWord(id);
     if (!w) return;
@@ -890,6 +905,7 @@
 
     words = words.filter(function (w) { return w.id !== id; });
     toast(t("permDeleted"));
+    await renumberWords(); // নতুন করে ১,২,৩ সাজানোর ফাংশন কল
     render();
     backgroundSync();
   }
