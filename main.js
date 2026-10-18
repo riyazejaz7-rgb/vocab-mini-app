@@ -869,25 +869,59 @@
     backgroundSync();
   }
 
-  async function deleteForever(id) {
+   async function deleteForever(id) {
     if (!(await confirmDialog(t("confirmDelForever")))) return;
+    
     await dbDeleteWord(id);
+    
+    if (window.VocabSync && window.VocabSync.getState().accessToken) {
+      try {
+        const token = window.VocabSync.getState().accessToken;
+        const url = window.APP_CONFIG.SUPABASE_URL + "/rest/v1/words?id=eq." + id;
+        await fetch(url, {
+          method: "DELETE",
+          headers: {
+            "apikey": window.APP_CONFIG.SUPABASE_PUBLISHABLE_KEY,
+            "Authorization": "Bearer " + token
+          }
+        });
+      } catch (e) { console.error("Cloud delete failed:", e); }
+    }
+
     words = words.filter(function (w) { return w.id !== id; });
     toast(t("permDeleted"));
     render();
     backgroundSync();
   }
-
-  async function emptyTrash() {
+   async function emptyTrash() {
     if (!(await confirmDialog(t("confirmEmptyTrash")))) return;
+    
     var trash = trashWords();
-    for (var i = 0; i < trash.length; i++) await dbDeleteWord(trash[i].id);
+    var idsToDelete = trash.map(function(w) { return w.id; });
+
+    for (var i = 0; i < trash.length; i++) {
+      await dbDeleteWord(trash[i].id);
+    }
+    
+    if (idsToDelete.length > 0 && window.VocabSync && window.VocabSync.getState().accessToken) {
+      try {
+        const token = window.VocabSync.getState().accessToken;
+        const url = window.APP_CONFIG.SUPABASE_URL + "/rest/v1/words?id=in.(" + idsToDelete.join(",") + ")";
+        await fetch(url, {
+          method: "DELETE",
+          headers: {
+            "apikey": window.APP_CONFIG.SUPABASE_PUBLISHABLE_KEY,
+            "Authorization": "Bearer " + token
+          }
+        });
+      } catch (e) { console.error("Cloud empty trash failed:", e); }
+    }
+
     words = words.filter(function (w) { return !w.deleted; });
     toast(t("trashEmptied"));
     render();
     backgroundSync();
   }
-
   function exportJson() {
     var payload = {
       app: "vocab-mini-app", version: 1,
