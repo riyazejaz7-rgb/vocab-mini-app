@@ -1003,19 +1003,52 @@
 
   async function importLines(text) {
     var lines = text.split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean);
-    if (lines.length && /^(english|en|word)\b/i.test(lines[0]) && lines[0].indexOf(",") > -1) lines.shift();
+    
+    // প্রথম লাইন হেডার হলে বাদ দাও
+    if (lines.length && /^(english|en|word)\b/i.test(lines[0])) lines.shift();
+    
     var added = 0, skipped = 0;
+    
     for (var i = 0; i < lines.length; i++) {
       var line = lines[i];
-      var m = line.match(/^(.+?)\s*[-–—]\s*(.+)$/);
-      var en, bnText;
-      if (m) { en = m[1].trim(); bnText = m[2].trim(); }
-      else { var parts = parseCsvLine(line); en = (parts[0] || "").trim(); bnText = parts[1] || ""; }
-      var bn = splitList(bnText);
+      var en = "", bn = [], syn = [], ant = [], ex = "", pos = "", note = "";
+
+      // ১. পাইপ (|) ফরম্যাট
+      if (line.indexOf("|") > -1) {
+        var parts = line.split("|").map(function(p){ return p.trim(); });
+        en = parts[0] || "";
+        bn = splitList(parts[1]);
+        syn = splitList(parts[2]);
+        ant = splitList(parts[3]);
+        ex = parts[4] || "";
+        if (parts[5]) pos = parts[5].toLowerCase(); 
+      } 
+      // ২. CSV কমা (,) ফরম্যাট
+      else if (line.indexOf(",") > -1) {
+        var csv = parseCsvLine(line);
+        en = (csv[0] || "").trim();
+        bn = splitList(csv[1] || "");
+        syn = splitList(csv[2] || "");
+        ant = splitList(csv[3] || "");
+        ex = (csv[4] || "").trim();
+        if (csv[5]) pos = csv[5].trim().toLowerCase();
+      }
+      // ৩. পুরনো ড্যাশ (-) ফরম্যাট
+      else {
+        var m = line.match(/^(.+?)\s*[-–—]\s*(.+)$/);
+        if (m) { en = m[1].trim(); bn = splitList(m[2]); }
+      }
+
+      // Part of Speech ভ্যালিডেশন
+      var validPos = ["noun", "verb", "adjective", "adverb", "preposition", "conjunction", "pronoun", "interjection", "other"];
+      if (pos && validPos.indexOf(pos) === -1) pos = "";
+
+      // ডুপ্লিকেট চেক এবং ডাটাবেসে সেভ
       if (!en || !bn.length || findDuplicate(en)) { skipped++; continue; }
+      
       var w = {
         id: uid(), no: await getNextNo(),
-        en: en, bn: bn, syn: [], ant: [], pos: "", ex: "", note: "",
+        en: en, bn: bn, pos: pos, syn: syn, ant: ant, ex: ex, note: note,
         created: Date.now(), updated: Date.now(), deleted: null,
         practiced: false, correctCount: 0, wrongCount: 0
       };
@@ -1026,7 +1059,6 @@
     await fixNextNo();
     toast(t("importResult", { a: added, s: skipped }));
   }
-
   function parseCsvLine(line) {
     var out = [], cur = "", inQ = false;
     for (var i = 0; i < line.length; i++) {
